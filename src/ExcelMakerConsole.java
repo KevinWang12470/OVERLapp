@@ -59,11 +59,11 @@ public final class ExcelMakerConsole {
         out.println("");
         out.println("");
 
-        for (int j = 0; j < numOfPeople; j++) {
-            out.println(namesList[j]);
-            out.print("Number of classes currently taking: ");
-
-        }
+//        for (int j = 0; j < numOfPeople; j++) {
+//            out.println(namesList[j]);
+//            out.print("Number of classes currently taking: ");
+//
+//        }
 
 //        out.println("You typed these names:");
 //        for (String name : namesList) {
