@@ -24,6 +24,12 @@ public final class ExcelMakerConsole {
             "Lab" };
 
     /**
+     * Array of school days.
+     */
+    private static final String[] SCHOOLDAYS = { "Monday", "Tuesday",
+            "Wednesday", "Thursday", "Friday" };
+
+    /**
      * Constant that holds the number of class types.
      */
     private static final int NUMOFCLASSTYPES = 3;
@@ -52,7 +58,7 @@ public final class ExcelMakerConsole {
      *            The output stream.
      */
     private static void outputName(String name, int classes, SimpleWriter out) {
-        out.println("<student name = \"" + name + "\" numberOfClasses = \""
+        out.println("\t<student name = \"" + name + "\" numberOfClasses = \""
                 + classes + "\"> ");
     }
 
@@ -65,7 +71,157 @@ public final class ExcelMakerConsole {
      *            The output stream.
      */
     private static void outputClass(String className, SimpleWriter out) {
-        out.println("<class className = \"" + className + "\">");
+        out.println("\t\t<class className = \"" + className + "\">");
+    }
+
+    /**
+     * Prompts user for whether a class has a Lecture, Recitation, or Lab.
+     *
+     * @param in
+     *            input stream
+     * @param out
+     *            output stream
+     * @return a boolean array containing whether sessions exist in the class in
+     *         question.
+     */
+    private static boolean[] checkSessionExistence(SimpleReader in,
+            SimpleWriter out) {
+        /*
+         * declare classType boolean array. Used to determine existence of LEC
+         * REC or LAB sessions per class
+         */
+        boolean[] sessionExists = new boolean[NUMOFCLASSTYPES];
+
+        for (int k = 0; k < NUMOFCLASSTYPES; k++) {
+            //initialize the temporary variable that holds user input
+            String yesOrNo = "placeHolder";
+
+            //keep asking if user does not input y/n
+            while (!yesOrNo.equals("y") && !yesOrNo.equals("n")) {
+                //prompt for input
+                out.print(CLASSTYPENAMES[k] + " (y/n): ");
+                //store input
+                yesOrNo = in.nextLine();
+                //if input is y/n, record in boolean array classType
+                if (yesOrNo.equals("y") || yesOrNo.equals("n")) {
+                    sessionExists[k] = (yesOrNo.equals("y"));
+                } else {
+                    //if input is not y/n, inform user
+                    out.println("Error. Please input either (y)es or (n)o");
+                }
+
+            }
+        }
+        return sessionExists;
+    }
+
+    /**
+     * Prompts the user for what time their class starts.
+     *
+     * @param in
+     *            Input Stream.
+     * @param out
+     *            Output Stream.
+     * @return user input time corresponding to the start time of the class in
+     *         question
+     */
+    private static String getStartTime(SimpleReader in, SimpleWriter out) {
+        //prompt for start time
+        out.print("Start time: ");
+
+        //record start time
+        String startTime = in.nextLine();
+
+        return startTime;
+    }
+
+    /**
+     * Prompts the user for what time their class ends.
+     *
+     * @param in
+     *            Input Stream.
+     * @param out
+     *            Output Stream.
+     * @return user input time corresponding to the end time of the class in
+     *         question
+     */
+    private static String getEndTime(SimpleReader in, SimpleWriter out) {
+        //prompt for end time
+        out.print("End time: ");
+
+        //record end time
+        String endTime = in.nextLine();
+
+        return endTime;
+    }
+
+    /**
+     * Prompts the user for where their class occurs.
+     *
+     * @param in
+     *            Input Stream.
+     * @param out
+     *            Output Stream.
+     * @return user input address corresponding to the location of the class in
+     *         question
+     */
+    private static String getLocation(SimpleReader in, SimpleWriter out) {
+        //prompt for end time
+        out.print("Location: ");
+
+        //record end time
+        String location = in.nextLine();
+
+        return location;
+    }
+
+    /**
+     * Prompts the user for what days their class occurs on.
+     *
+     * @param in
+     *            Input Stream
+     * @param out
+     *            Output Stream
+     * @return A string of length 5 consisting of 1s and 0s. 1 means class
+     *         occurs on the day, 0 means no class.
+     */
+    private static String getOccurrenceFrequency(SimpleReader in,
+            SimpleWriter out) {
+
+        //output string, contains 5 chars that are either 1 or 0
+        String frequency = new String();
+
+        String inputChar;
+
+        /*
+         * Iterate for however many school days there are.
+         */
+        for (int i = 0; i < SCHOOLDAYS.length; i++) {
+
+            //initialize the variable
+            inputChar = "placeHolder";
+
+            //keep asking if user does not input y/n
+            while (!inputChar.equals("y") && !inputChar.equals("n")) {
+                //prompt for input
+                out.print("Class on " + SCHOOLDAYS[i] + " (y/n): ");
+                //store input
+                inputChar = in.nextLine();
+                //if input is y/n, change String frequency accordingly
+                if (inputChar.equals("y")) {
+                    frequency = frequency.concat("1");
+                } else if (inputChar.equals("n")) {
+                    frequency = frequency.concat("0");
+                } else {
+                    //if input is not y/n, inform user
+                    out.println("Error. Please input either (y)es or (n)o");
+                }
+
+            }
+
+        }
+
+        return frequency;
     }
 
     /**
@@ -81,25 +237,31 @@ public final class ExcelMakerConsole {
      *            End time.
      * @param location
      *            Building location.
+     * @param frequency
+     *            Class occurrence frequency.
      * @param out
      *            The output stream.
      */
     private static void outputClassInfo(boolean[] type, String[] start,
-            String[] end, String[] location, SimpleWriter out) {
+            String[] end, String[] location, String[] frequency,
+            SimpleWriter out) {
         if (type[0]) {
-            out.println("<LEC start = \"" + start[0] + "\" end = \"" + end[0]
-                    + "\" location = \"" + location[0] + "\"/>");
+            out.println("\t\t\t<LEC start = \"" + start[0] + "\" end = \""
+                    + end[0] + "\" location = \"" + location[0]
+                    + "\" frequency = \"" + frequency[0] + "\" />");
         }
         if (type[1]) {
-            out.println("<REC start = \"" + start[1] + "\" end = \"" + end[1]
-                    + "\" location = \"" + location[1] + "\"/>");
+            out.println("\t\t\t<REC start = \"" + start[1] + "\" end = \""
+                    + end[1] + "\" location = \"" + location[1]
+                    + "\" frequency = \"" + frequency[1] + "\" />");
         }
         if (type[2]) {
-            out.println("<LAB start = \"" + start[2] + "\" end = \"" + end[2]
-                    + "\" location = \"" + location[2] + "\"/>");
+            out.println("\t\t\t<LAB start = \"" + start[2] + "\" end = \""
+                    + end[2] + "\" location = \"" + location[2]
+                    + "\" frequency = \"" + frequency[2] + "\" />");
         }
 
-        out.println("</class>");
+        out.println("\t\t</class>");
     }
 
     /**
@@ -109,7 +271,7 @@ public final class ExcelMakerConsole {
      *            The output stream.
      */
     private static void outputStudentFooter(SimpleWriter out) {
-        out.println("</student>");
+        out.println("\t</student>");
     }
 
     /**
@@ -122,7 +284,14 @@ public final class ExcelMakerConsole {
         SimpleReader in = new SimpleReader1L();
         SimpleWriter out = new SimpleWriter1L();
 
-        SimpleWriter fileOut = new SimpleWriter1L("xmlSchedule.txt");
+        //name of file, also name of root node
+        String root = "xmlSchedule.xml";
+        SimpleWriter fileOut = new SimpleWriter1L(root);
+
+        /*
+         * Output root node.
+         */
+        fileOut.println("<" + root + ">");
 
         /*
          * Prompt for and record the number of names
@@ -185,33 +354,10 @@ public final class ExcelMakerConsole {
                 out.println();
 
                 /*
-                 * declare classType boolean array. Used to determine existence
-                 * of LEC REC or LAB sessions per class
+                 * Record which sessions exist in the class in question. Store
+                 * to classType boolean array.
                  */
-                boolean[] classType = new boolean[NUMOFCLASSTYPES];
-
-                for (int k = 0; k < NUMOFCLASSTYPES; k++) {
-                    //initialize the temporary variable that holds user input
-                    String yesOrNo = "placeHolder";
-
-                    //keep asking if user does not input y/n
-                    while (!yesOrNo.equals("y") && !yesOrNo.equals("n")) {
-                        //prompt for input
-                        out.print(CLASSTYPENAMES[k] + " (y/n): ");
-                        //store input
-                        yesOrNo = in.nextLine();
-                        //if input is y/n, record in boolean array classType
-                        if (yesOrNo.equals("y") || yesOrNo.equals("n")) {
-                            classType[k] = (yesOrNo.equals("y"));
-                        } else {
-                            //if input is not y/n, inform user
-                            out.println(
-                                    "Error. Please input either (y)es or (n)o");
-                        }
-
-                    }
-
-                }
+                boolean[] classType = checkSessionExistence(in, out);
 
                 /*
                  * Arrays used to store user info on classes. These will later
@@ -220,18 +366,18 @@ public final class ExcelMakerConsole {
                 String[] start = new String[NUMOFCLASSTYPES];
                 String[] end = new String[NUMOFCLASSTYPES];
                 String[] location = new String[NUMOFCLASSTYPES];
+                String[] occurrenceFrequency = new String[NUMOFCLASSTYPES];
 
                 for (int l = 0; l < NUMOFCLASSTYPES; l++) {
                     //if the session exists for this class, prompt and record
                     if (classType[l]) {
                         out.println();
                         out.println(CLASSTYPENAMES[l]);
-                        out.print("Start time: ");
-                        start[l] = in.nextLine();
-                        out.print("End time: ");
-                        end[l] = in.nextLine();
-                        out.print("Location: ");
-                        location[l] = in.nextLine();
+                        start[l] = getStartTime(in, out);
+                        end[l] = getEndTime(in, out);
+                        location[l] = getLocation(in, out);
+                        occurrenceFrequency[l] = getOccurrenceFrequency(in,
+                                out);
                     } else {
                         //If session does not exist for this class, input null values
                         start[l] = "N/A";
@@ -241,28 +387,27 @@ public final class ExcelMakerConsole {
 
                 }
                 //print the class information in an xml file
-                outputClassInfo(classType, start, end, location, fileOut);
+                outputClassInfo(classType, start, end, location,
+                        occurrenceFrequency, fileOut);
             }
             //print the footer of the student tag
             outputStudentFooter(fileOut);
         }
 
-//        out.println("You typed these names:");
-//        for (String name : namesList) {
-//            out.println(name);
-//        }
-
         /*
-         * Put your main program code here; it may call myMethod as shown
+         * output root footer
          */
+        fileOut.println("</" + root + ">");
 
         /*
          * Close input and output streams
          */
+        fileOut.close();
         printDone();
+
         in.close();
         out.close();
-        fileOut.close();
+
     }
 
 }
