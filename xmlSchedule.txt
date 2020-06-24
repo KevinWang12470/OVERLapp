@@ -1,0 +1,16 @@
+<student name = "Kevin" numberOfClasses = "2"> 
+<class className = "CSE 2221">
+<LEC start = "3:00PM" end = "4:00PM" location = "Dreese 225"/>
+<LAB start = "3:30PM" end = "4:30PM" location = "Dreese 445"/>
+</class>
+<class className = "Math 2568">
+<LEC start = "12:25PM" end = "1:30PM" location = "Knowlton 200"/>
+</class>
+</student>
+<student name = "Vincente" numberOfClasses = "1"> 
+<class className = "Chem 1225">
+<LEC start = "2:00PM" end = "3:00PM" location = "Some building"/>
+<REC start = "4:00PM" end = "5:30PM" location = "Nosker Lobby"/>
+<LAB start = "7:00PM" end = "9:20PM" location = "Scott Dining Hall"/>
+</class>
+</student>
