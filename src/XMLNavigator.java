@@ -56,6 +56,27 @@ public final class XMLNavigator {
             }
 
         }
+//TODO: find a way to print int arrays
+        String timeExample = "4:10PM";
+
+        out.println(timeExample.toLowerCase());
+
+        if (ExcelMakerConsole.correctTime(timeExample)) {
+
+            out.println();
+
+            int[] timeStamp = ExcelMakerConsole.parseTime(timeExample);
+
+            /*
+             * ExcelMakerConsole.parseTime(
+             * rootNode.child(0).child(0).child(0).attributeValue("start"));
+             */
+            out.println("Start time in 24hr time: " + timeStamp[0]
+                    + " hours and " + timeStamp[1] + " minutes");
+        }
+
+//TODO: False negative??
+//        out.println(ExcelMakerConsole.correctTime(timeExample, out));
 
         in.close();
         out.close();

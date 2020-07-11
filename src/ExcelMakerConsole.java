@@ -1,3 +1,5 @@
+import components.set.Set;
+import components.set.Set1L;
 import components.simplereader.SimpleReader;
 import components.simplereader.SimpleReader1L;
 import components.simplewriter.SimpleWriter;
@@ -6,7 +8,7 @@ import components.simplewriter.SimpleWriter1L;
 /**
  * Put a short phrase describing the program here.
  *
- * @author Put your name here
+ * @author Kevin Wang.12470
  *
  */
 public final class ExcelMakerConsole {
@@ -33,6 +35,27 @@ public final class ExcelMakerConsole {
      * Constant that holds the number of class types.
      */
     private static final int NUMOFCLASSTYPES = 3;
+
+    /**
+     * int constant used to convert 12hr time to 24hr time. Messy twelve.
+     */
+    private static final int TWELVE = 12;
+
+    /**
+     * The minute number must not reach sixty.
+     */
+    private static final int SIXTY = 60;
+
+    /**
+     * The timeframe that the table will display in 24hr.
+     */
+    private static final int[] SCHEDULESTART = { 6, 0 },
+            SCHEDULEEND = { 22, 0 };
+
+    /**
+     * String of separator characters, to separate hour vs minute.
+     */
+    private static final String SEPARATORS = ";':., ", DIGITS = "0123456789";
 
     /**
      * Put a short phrase describing the static method myMethod here.
@@ -126,11 +149,29 @@ public final class ExcelMakerConsole {
      *         question
      */
     private static String getStartTime(SimpleReader in, SimpleWriter out) {
-        //prompt for start time
-        out.print("Start time: ");
+        boolean properFormat = false;
+        String startTime = "placeHolder";
 
-        //record start time
-        String startTime = in.nextLine();
+        /*
+         * Keep asking for start time if user input is not of proper format.
+         */
+        while (!properFormat) {
+
+            //prompt for start time
+            out.print("Start time: ");
+
+            //record start time
+            startTime = in.nextLine();
+
+            //check if input is in proper format
+            properFormat = correctTime(startTime);
+
+            if (!properFormat) {
+                out.println();
+                out.println("Sorry, cannot read the user input start time.");
+                out.println("Please try again.");
+            }
+        }
 
         return startTime;
     }
@@ -146,11 +187,28 @@ public final class ExcelMakerConsole {
      *         question
      */
     private static String getEndTime(SimpleReader in, SimpleWriter out) {
-        //prompt for end time
-        out.print("End time: ");
+        boolean properFormat = false;
+        String endTime = "placeHolder";
 
-        //record end time
-        String endTime = in.nextLine();
+        /*
+         * Keep asking for end time if user input is not of proper format.
+         */
+        while (!properFormat) {
+            //prompt for end time
+            out.print("End time: ");
+
+            //record end time
+            endTime = in.nextLine();
+
+            //check if input is in proper format
+            properFormat = correctTime(endTime);
+
+            if (!properFormat) {
+                out.println();
+                out.println("Sorry, cannot read the user input end time.");
+                out.println("Please try again.");
+            }
+        }
 
         return endTime;
     }
@@ -275,6 +333,260 @@ public final class ExcelMakerConsole {
     }
 
     /**
+     * Generates the set of characters in the given {@code String} into the
+     * given {@code Set}.
+     *
+     * @param str
+     *            the given {@code String}
+     * @param strSet
+     *            the {@code Set} to be replaced
+     * @replaces strSet
+     * @ensures strSet = entries(str)
+     */
+    private static void generateElements(String str, Set<Character> strSet) {
+        assert str != null : "Violation of: str is not null";
+        assert strSet != null : "Violation of: strSet is not null";
+
+        /* clear the set */
+        strSet.clear();
+        /*
+         * iterate through the string, adding characters to the set and checking
+         * for redundancy
+         */
+        for (int i = 0; i < str.length(); i++) {
+            if (!strSet.contains(str.charAt(i))) {
+                strSet.add(str.charAt(i));
+            }
+        }
+
+    }
+
+    /**
+     * Takes the time attribute and figures out the specific number for the hour
+     * and minute.
+     *
+     * @param timeString
+     *            the time of the class (start or end)
+     *
+     *            param out output stream.
+     *
+     *
+     * @return an int array of length 2 that shows the hour, then the minute
+     */
+    public static boolean correctTime(
+            String timeString/* , SimpleWriter out */) {
+        assert timeString != null : "Violation of: text is not null";
+        int[] timeArray = new int[2];
+
+        int substringIndex = 0;
+        int intsDetected = 0;
+        boolean correctFormat = true;
+
+        //changing to lowercase for when checking am pm
+        String lowerCaseTime = timeString.toLowerCase();
+
+        /*
+         * declare and initialize digit number set to ensure just one of each
+         * character
+         */
+        Set<Character> digitSet = new Set1L<>();
+        generateElements(DIGITS, digitSet);
+
+        assert digitSet != null : "Violation of: digits is not null";
+
+        /*
+         * Keep iterating until at the end of the string
+         */
+        while (substringIndex < lowerCaseTime
+                .length() /* && intsDetected < 2 */) {
+
+            //temp string that will hold either hour or minute.
+            String hrMinComponent = new String();
+            /*
+             * If the "starting" character is not a digit
+             */
+            if (!digitSet.contains(lowerCaseTime.charAt(substringIndex))) {
+
+                /*
+                 * iterate through the string until a character is a digit.
+                 */
+                while (substringIndex < lowerCaseTime.length() && !digitSet
+                        .contains(lowerCaseTime.charAt(substringIndex))) {
+
+                    //keep track of substring index
+                    substringIndex++;
+                }
+            } else {
+                /*
+                 * otherwise, iterate through the string and record until the
+                 * character is not a digit
+                 */
+                while (substringIndex < lowerCaseTime.length() && digitSet
+                        .contains(lowerCaseTime.charAt(substringIndex))) {
+
+                    //add the current character to the temp String
+                    hrMinComponent = hrMinComponent.concat(lowerCaseTime
+                            .substring(substringIndex, substringIndex + 1));
+
+                    //keep track of substring index
+                    substringIndex++;
+                }
+                //keep track of how many instances of numbers have occurred.
+                intsDetected++;
+
+//                out.println("ints detected in loop: " + intsDetected);
+
+                /*
+                 * Convert hrMinComponent to an int, then record the result to
+                 * timeArray only if there are less than 3 ints detected.
+                 */
+
+                if (intsDetected <= 2) {
+                    timeArray[intsDetected - 1] = Integer
+                            .parseInt(hrMinComponent);
+                }
+
+                /*
+                 * Ensure proper conversion between 12hr and 24hr.
+                 */
+                if (lowerCaseTime.endsWith("pm") && intsDetected == 1
+                        && !(timeArray[0] == TWELVE)) {
+                    timeArray[0] += TWELVE;
+                } else if (lowerCaseTime.endsWith("am") && intsDetected == 1
+                        && (timeArray[0] == TWELVE)) {
+                    timeArray[0] = 0;
+                }
+
+            }
+
+        }
+
+//        out.println("hr " + timeArray[0]);
+//        out.println("min" + timeArray[1]);
+        /*
+         * Check for the correct time format.
+         */
+        //0 <= Hour < 24
+        //0 <= Minute < 60
+        //only two instances of integers in user input
+        correctFormat = timeArray[0] >= 0 && timeArray[0] < TWELVE * 2
+                && timeArray[1] >= 0 && timeArray[1] < SIXTY
+                && intsDetected == 2;
+
+//        out.println("intsDetected = " + intsDetected);
+
+        return correctFormat;
+    }
+
+    /**
+     * Takes the time attribute and figures out the specific number for the hour
+     * and minute.
+     *
+     * @param timeString
+     *            the time of the class (start or end)
+     *
+     * @return an int array of length 2 that shows the hour, then the minute
+     */
+    public static int[] parseTime(String timeString) {
+        assert timeString != null : "Violation of: text is not null";
+        int[] timeArray = new int[2];
+
+        int substringIndex = 0;
+        int intsDetected = 0;
+
+        //changing to lowercase for when checking am pm
+        String lowerCaseTime = timeString.toLowerCase();
+
+        /*
+         * declare and initialize separactor character set to ensure just one of
+         * each character
+         */
+        Set<Character> digitSet = new Set1L<>();
+        generateElements(DIGITS, digitSet);
+
+        assert digitSet != null : "Violation of: digits is not null";
+
+        /*
+         * Keep iterating until at the end of the string
+         */
+        while (substringIndex < lowerCaseTime
+                .length()/* && intsDetected < 2 */) {
+
+            //temp string that will hold either hour or minute.
+            String hrMinComponent = new String();
+            /*
+             * If the "starting" character is not a digit
+             */
+            if (!digitSet.contains(lowerCaseTime.charAt(substringIndex))) {
+
+                /*
+                 * iterate through the string until a character is a digit.
+                 */
+                while (substringIndex < lowerCaseTime.length() && !digitSet
+                        .contains(lowerCaseTime.charAt(substringIndex))) {
+
+                    //keep track of substring index
+                    substringIndex++;
+                }
+            } else {
+                /*
+                 * otherwise, iterate through the string and record until the
+                 * character is not a digit
+                 */
+                while (substringIndex < lowerCaseTime.length() && digitSet
+                        .contains(lowerCaseTime.charAt(substringIndex))) {
+
+                    //add the current character to the temp String
+                    hrMinComponent = hrMinComponent.concat(lowerCaseTime
+                            .substring(substringIndex, substringIndex + 1));
+
+                    //keep track of substring index
+                    substringIndex++;
+                }
+                //keep track of how many instances of numbers have occured.
+                intsDetected++;
+
+                /*
+                 * Convert hrMinComponent to an int, then record the result to
+                 * timeArray only if there are less than 3 ints detected.
+                 */
+                if (intsDetected <= 2) {
+                    timeArray[intsDetected - 1] = Integer
+                            .parseInt(hrMinComponent);
+                }
+                /*
+                 * Ensure proper conversion between 12hr and 24hr.
+                 */
+                if (lowerCaseTime.endsWith("pm") && intsDetected == 1
+                        && !(timeArray[0] == TWELVE)) {
+                    timeArray[0] += TWELVE;
+                } else if (lowerCaseTime.endsWith("am") && intsDetected == 1
+                        && (timeArray[0] == TWELVE)) {
+                    timeArray[0] = 0;
+                }
+
+            }
+
+        }
+
+        return timeArray;
+    }
+
+    /**
+     * Takes the time attribute and figures out where on the table (in rows) to
+     * put the cell.
+     *
+     * @param classTime
+     *            the time of the class (start or end)
+     * @return the row number of that time slot
+     */
+    private static int convertTimetoRow(String classTime) {
+        int rowIndex = 0;
+        //TODO: probably finish after parseTime.
+        return rowIndex;
+    }
+
+    /**
      * Main method.
      *
      * @param args
@@ -383,6 +695,7 @@ public final class ExcelMakerConsole {
                         start[l] = "N/A";
                         end[l] = "N/A";
                         location[l] = "N/A";
+                        occurrenceFrequency[l] = "N/A";
                     }
 
                 }
