@@ -1,0 +1,7 @@
+<timeColumnTest.xml>
+	<student name = "Kevin" numberOfClasses = "1"> 
+		<class className = "Home school">
+			<LAB start = "12:00PM" end = "4:00PM" location = "Home" frequency = "11111" />
+		</class>
+	</student>
+</timeColumnTest.xml>

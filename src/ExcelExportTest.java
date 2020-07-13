@@ -12,7 +12,6 @@ import org.apache.poi.ss.usermodel.HorizontalAlignment;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
-import org.apache.poi.ss.util.CellRangeAddress;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 import components.simplereader.SimpleReader;
@@ -66,25 +65,114 @@ public final class ExcelExportTest {
         //Initialize the row
         Row row = page1.createRow(0);
 
+        //make some time number variables
+        int startTime = 6;
+        int endTime = 22;
+        int currentRow = 1;
         //Put in some cells
 
         Cell cell = row.createCell(0);
-        cell.setCellValue("This is Cell 1A");
+
+        //24hr time template
+        //start hour to end hour
+//        for (int i = startTime; i <= endTime; i++) {
+//            //print :00 and :30
+//            /*
+//             * if desired, all cells can show time by setting j < 4
+//             */
+//            for (int j = 0; j < 2; j++) {
+//                row = page1.createRow(currentRow);
+//                cell = row.createCell(0);
+//
+//                //ensure :00 is printed instead of :0
+//                if (j == 0) {
+//                    cell.setCellValue(i + ":00");
+//
+//                } else if (i != endTime) {
+//
+//                    //in this format in case all cells show time (j * 15)
+//                    cell.setCellValue(i + ":" + j * 30);
+//                }
+//                /*
+//                 * move down the sheet according to the timeline. Each cell
+//                 * counts as 15 minutes. just do currentRow++ if all cells are
+//                 * to show time.
+//                 */
+//                currentRow = currentRow + 2;
+//            }
+//        }
+
+        //12hr time template
+        //start hour to end hour
+        for (int i = startTime; i <= endTime; i++) {
+            //print :00 and :30
+            /*
+             * if desired, all cells can show time by setting j < 4
+             */
+            for (int j = 0; j < 2; j++) {
+                row = page1.createRow(currentRow);
+                cell = row.createCell(0);
+
+                //ensure :00 is printed instead of :0
+                if (j == 0) {
+
+                    //if in the 12 AM area
+                    if (i == 0) {
+                        cell.setCellValue("12:00AM");
+                    }
+                    //if PM
+                    if (i > 12) {
+                        cell.setCellValue(i - 12 + ":00PM");
+
+                    }
+                    //if AM
+                    else {
+                        cell.setCellValue(i + ":00AM");
+                    }
+
+                } else if (i != endTime) {
+
+                    //in this format in case all cells show time (j * 15)
+                    //if 12 AM
+                    if (i == 0) {
+                        cell.setCellValue("12:" + j * 30 + "AM");
+                    }
+                    //if PM
+                    if (i > 12) {
+                        cell.setCellValue(i - 12 + ":" + j * 30 + "PM");
+                    }
+                    //if AM
+                    else {
+                        cell.setCellValue(i + ":" + j * 30 + "AM");
+                    }
+                }
+
+                /*
+                 * move down the sheet according to the timeline. Each cell
+                 * counts as 15 minutes. just do currentRow++ if all cells are
+                 * to show time.
+                 */
+                currentRow = currentRow + 2;
+
+            }
+        }
+
+//        cell.setCellValue("This is Cell 1A");
 
         CellStyle style1 = excelFile.createCellStyle();
 
         style1.setWrapText(true);
         style1.setAlignment(HorizontalAlignment.CENTER);
-        cell.setCellStyle(style1);
+//        cell.setCellStyle(style1);
 
         //Merged cell
-        row = page1.createRow(1);
-        cell = row.createCell(0);
-
-        cell.setCellStyle(style1);
-        page1.addMergedRegion(new CellRangeAddress(1, 7, 0, 0));
-        cell.setCellValue(
-                "Let's put some effort into this program so people can actually use it!");
+//        row = page1.createRow(1);
+//        cell = row.createCell(0);
+//
+//        cell.setCellStyle(style1);
+//        page1.addMergedRegion(new CellRangeAddress(1, 7, 0, 0));
+//        cell.setCellValue(
+//                "Let's put some effort into this program so people can actually use it!");
 
         //write operation workbook using file out object
         excelFile.write(exOut);
@@ -94,6 +182,11 @@ public final class ExcelExportTest {
         //exOut.flush();
 
         out.println("file created successfully");
+
+        int[] basicTimeFrame = { 10, 15 };
+
+        ExcelMakerConsole.createSheetTemplate("createSheetTemplateTest.xlsx",
+                true, basicTimeFrame);
         in.close();
         out.close();
     }

@@ -1,9 +1,19 @@
+import java.io.File;
+import java.io.FileOutputStream;
+
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+
 import components.set.Set;
 import components.set.Set1L;
 import components.simplereader.SimpleReader;
 import components.simplereader.SimpleReader1L;
 import components.simplewriter.SimpleWriter;
 import components.simplewriter.SimpleWriter1L;
+import components.utilities.FormatChecker;
 
 /**
  * Put a short phrase describing the program here.
@@ -47,15 +57,25 @@ public final class ExcelMakerConsole {
     private static final int SIXTY = 60;
 
     /**
+     * The half hour mark.
+     */
+    private static final int THIRTY = 30;
+
+    /**
+     * Used in promptTimeFrame method when prompting for start time and end
+     * time.
+     */
+    private static final String[] STARTEND = { "start", "end" };
+
+    /**
      * The timeframe that the table will display in 24hr.
      */
-    private static final int[] SCHEDULESTART = { 6, 0 },
-            SCHEDULEEND = { 22, 0 };
+    private static final int[] DEFAULTTIMEFRAME = { 6, 22 };
 
     /**
      * String of separator characters, to separate hour vs minute.
      */
-    private static final String SEPARATORS = ";':., ", DIGITS = "0123456789";
+    private static final String /* SEPARATORS = ";':., ", */ DIGITS = "0123456789";
 
     /**
      * Put a short phrase describing the static method myMethod here.
@@ -573,6 +593,438 @@ public final class ExcelMakerConsole {
     }
 
     /**
+     * Prompts the user on info such as whether to use 24 or 12 hr time, whether
+     * to have a 5 or 7 day week, and the name of the file.
+     *
+     * @param in
+     *            input stream
+     * @param out
+     *            output stream
+     * @return boolean value, 12hr time if true, 24hr time if false
+     */
+    private static boolean promptHrFormat(SimpleReader in, SimpleWriter out) {
+
+        //Variables
+        boolean twelveTime;
+        String userInput = "placeholder";
+
+        out.println("");
+
+        /*
+         * Gets user input
+         */
+        while (!(userInput.equals("0") || userInput.equals("1"))) {
+
+            //prompt for 12 hour or 24 hour time
+            out.print(
+                    "Use 12-hour time (1) or 24-hour time (0) on the schedule: ");
+
+            //read and record user input
+            userInput = in.nextLine();
+
+            //in case user does not input 1 or 0
+            if (!(userInput.equals("0") || userInput.equals("1"))) {
+                out.println();
+                out.println("Please input either (1) for 12 hour time");
+                out.println("or (0) for 24 hour time **No parenthesis**");
+                out.println();
+            }
+        }
+        twelveTime = userInput.equals("1");
+
+        return twelveTime;
+    }
+
+    /**
+     * Prompts the user on info such as whether to use 24 or 12 hr time, whether
+     * to have a 5 or 7 day week, and the name of the file.
+     *
+     * @param in
+     *            input stream
+     * @param out
+     *            output stream
+     * @return boolean, 5 day week if true, 7 day week if false
+     */
+    private static boolean promptWeekFormat(SimpleReader in, SimpleWriter out) {
+
+        //
+        boolean fivedays;
+        String userInput = "placeholder";
+
+        out.println("");
+
+        /*
+         * Gets user input
+         */
+        while (!(userInput.equals("0") || userInput.equals("1"))) {
+
+            //prompt for 12 hour or 24 hour time
+            out.print(
+                    "Use 5 day week (1) or 7 day week (0) format on the schedule: ");
+
+            //read and record user input
+            userInput = in.nextLine();
+
+            //in case user does not input 1 or 0
+            if (!(userInput.equals("0") || userInput.equals("1"))) {
+                out.println();
+                out.println("Please input either (1) for 5 day week format");
+                out.println("or (0) for 7 day week format **No parenthesis**");
+                out.println();
+            }
+        }
+        fivedays = userInput.equals("1");
+
+        return fivedays;
+    }
+
+    /**
+     * Prompts the user on info such as whether to use 24 or 12 hr time, whether
+     * to have a 5 or 7 day week, and the name of the file.
+     *
+     * @param in
+     *            input stream
+     * @param out
+     *            output stream
+     * @return a String to be used as the file name of the schedule
+     */
+    private static String promptSheetName(SimpleReader in, SimpleWriter out) {
+
+        boolean maySubmit = false;
+        String fileName = null;
+        String userInput = "placeholder";
+
+        out.println("");
+
+        /*
+         * Gets user input
+         */
+        while (!maySubmit) {
+
+            //prompt for 12 hour or 24 hour time
+            out.print("Input a name for the group schedule: ");
+
+            //read and record user input
+            userInput = in.nextLine();
+
+            //check for proper file type suffix
+            if (userInput.endsWith(".xlsx")) {
+
+                while (!(userInput.equals("0") || userInput.equals("1"))) {
+                    //prompt to continue
+                    fileName = userInput;
+                    out.print("Finish (1) or Redo Name (0): ");
+                    userInput = in.nextLine();
+
+                    //in case user does not input 1 or 0
+                    if (!(userInput.equals("0") || userInput.equals("1"))) {
+                        out.println();
+                        out.println();
+                        out.println(
+                                "Please input either (1) to continue or (0) to");
+                        out.println("change the file name **No parenthesis**");
+                        out.println();
+                        out.println();
+                    } else {
+                        maySubmit = userInput.equals("1");
+                    }
+                }
+            } else {
+                out.println();
+                out.println("Please end the name of the file with \".xlsx\"");
+                out.println();
+            }
+        }
+
+        return fileName;
+
+    }
+
+    /**
+     * Prompts the user on info such as whether to use 24 or 12 hr time, whether
+     * to have a 5 or 7 day week, and the name of the file.
+     *
+     * @param in
+     *            input stream
+     * @param out
+     *            output stream
+     * @return a String to be used as the file name of the schedule
+     */
+    private static int[] promptTimeFrame(SimpleReader in, SimpleWriter out) {
+
+        //initialize default time frame
+        int[] timeFrame = new int[2];
+        timeFrame[0] = DEFAULTTIMEFRAME[0];
+        timeFrame[1] = DEFAULTTIMEFRAME[1];
+
+        //temp variables
+        String userInput = "placeholder";
+        boolean selfInput;
+
+        while (!(userInput.equals("y") || userInput.equals("n"))) {
+            //prompt to use default time frame
+            out.println("");
+            out.println(
+                    "Default schedule time frame is 6:00 AM - 10:00 PM (6:00 - 22:00)");
+            out.println("Use default schedule?");
+            out.print("Input (y)es or (n)o: ");
+            userInput = in.nextLine();
+
+            //in case user does not input y or n
+            if (!(userInput.equals("y") || userInput.equals("n"))) {
+                out.println();
+                out.println(
+                        "Please input either (y) to use the default time frame");
+                out.println(
+                        "or (n) to set your own time frame **No parenthesis**");
+            }
+        }
+        selfInput = userInput.equals("n");
+
+        /*
+         * Keep looping until user is satisfied with their input.
+         */
+        while (selfInput) {
+
+            /*
+             * Loop here for start and end time prompting, using STARTEND to
+             * prompt for start and end.
+             */
+            for (int i = 0; i < 2; i++) {
+
+                /*
+                 * Keep asking until 0 <= time < 24
+                 */
+                while (!FormatChecker.canParseInt(userInput)
+                /*
+                 * && Integer.parseInt(userInput) >= 0 &&
+                 * Integer.parseInt(userInput) < TWELVE * 2
+                 */) {
+
+                    //prompt
+                    out.println();
+                    out.print("Input your preferred schedule " + STARTEND[i]
+                            + " time in hours (0 to 23): ");
+                    userInput = in.nextLine();
+
+                    if (FormatChecker.canParseInt(userInput)
+                            && Integer.parseInt(userInput) >= 0
+                            && Integer.parseInt(userInput) < TWELVE * 2) {
+                        /*
+                         * Create variable to store parseInt userinput? or keep
+                         * as is?
+                         */
+                        timeFrame[i] = Integer.parseInt(userInput);
+                    } else {
+                        out.println();
+                        out.println();
+                        out.println(
+                                "Please input an integer that is greater than");
+                        out.println("or equal to 0 and less than 24.");
+                        out.println();
+                        out.println();
+
+                        /*
+                         * reset user input to continue looping since time frame
+                         * is incorrect
+                         */
+                        userInput = "placeholder";
+                    }
+                }
+                //reset user input in order to prompt for end time
+                userInput = "placeholder";
+            }
+
+            //repeat to user what their input time was
+            out.println("Is a start time of " + timeFrame[0] + ":00 and an");
+            out.println("end time of " + timeFrame[1] + ":00 good?");
+
+            while (!(userInput.equals("y") || userInput.equals("n"))) {
+
+                //prompt to continue or redo time frame
+                out.println();
+                out.print("Input (y)es to continue or "
+                        + "(n)o to redo the schedule time frame: ");
+                userInput = in.nextLine();
+
+                //in case user does not input y or n
+                if (!(userInput.equals("y") || userInput.equals("n"))) {
+                    out.println();
+                    out.println(
+                            "Please input either (y) to continue or (n) to");
+                    out.println(
+                            "redo the schedule time frame **No parenthesis**");
+                }
+            }
+
+            //end method or loop to redo time frame.
+            selfInput = userInput.equals("n");
+
+        }
+        return timeFrame;
+    }
+
+    /**
+     * Generates the time column on the left in 12 hr time.
+     *
+     * @param file
+     *            The workbook for the time column to be generated in.
+     * @param sheet
+     *            The sheet for the time column to be generated in.
+     * @param timeFrame
+     *            time frame to build the schedule around.
+     */
+    private static void generate12HrTime(Workbook file, Sheet sheet,
+            int[] timeFrame) {
+        //Initialize the row and cell
+        Row row = sheet.createRow(0);
+        Cell cell = row.createCell(0);
+
+        //make some time number variables
+        int startTime = timeFrame[0];
+        int endTime = timeFrame[1];
+        int currentRow = 1;
+        //Put in some cells
+        //start hour to end hour
+        for (int i = startTime; i <= endTime; i++) {
+            //print :00 and :30
+            /*
+             * if desired, all cells can show time by setting j < 4
+             */
+            for (int j = 0; j < 2; j++) {
+                row = sheet.createRow(currentRow);
+                cell = row.createCell(0);
+
+                //ensure :00 is printed instead of :0
+                if (j == 0) {
+
+                    //if in the 12 AM area
+                    if (i == 0) {
+                        cell.setCellValue("12:00AM");
+                    }
+                    //if PM
+                    if (i > TWELVE) {
+                        cell.setCellValue(i - TWELVE + ":00PM");
+
+                    } /* if AM */ else {
+                        cell.setCellValue(i + ":00AM");
+                    }
+
+                } /* ensures time column ends at end:00 */ else if (i != endTime) {
+
+                    //in this format in case all cells show time (j * 15)
+                    //if 12 AM
+                    if (i == 0) {
+                        cell.setCellValue("12:" + j * THIRTY + "AM");
+                    }
+                    //if PM
+                    if (i > TWELVE) {
+                        cell.setCellValue(i - TWELVE + ":" + j * THIRTY + "PM");
+                    } /* if AM */ else {
+                        cell.setCellValue(i + ":" + j * THIRTY + "AM");
+                    }
+                }
+
+                /*
+                 * move down the sheet according to the timeline. Each cell
+                 * counts as 15 minutes. just do currentRow++ if all cells are
+                 * to show time.
+                 */
+                currentRow = currentRow + 2;
+
+            }
+        }
+    }
+
+    /**
+     * Generates the time column on the left in 12 hr time.
+     *
+     * @param file
+     *            The workbook for the time column to be generated in.
+     * @param sheet
+     *            The sheet for the time column to be generated in.
+     * @param timeFrame
+     *            time frame to build the schedule around
+     */
+    private static void generate24HrTime(Workbook file, Sheet sheet,
+            int[] timeFrame) {
+        //Initialize the row and cell
+        Row row = sheet.createRow(0);
+        Cell cell = row.createCell(0);
+
+        //make some time number variables
+        int startTime = timeFrame[0];
+        int endTime = timeFrame[1];
+        int currentRow = 1;
+        for (int i = startTime; i <= endTime; i++) {
+            //print :00 and :30
+            /*
+             * if desired, all cells can show time by setting j < 4
+             */
+            for (int j = 0; j < 2; j++) {
+                row = sheet.createRow(currentRow);
+                cell = row.createCell(0);
+
+                //ensure :00 is printed instead of :0
+                if (j == 0) {
+                    cell.setCellValue(i + ":00");
+
+                } /* ensures time column ends at end:00 */ else if (i != endTime) {
+
+                    //in this format in case all cells show time (j * 15)
+                    cell.setCellValue(i + ":" + j * THIRTY);
+                }
+                /*
+                 * move down the sheet according to the timeline. Each cell
+                 * counts as 15 minutes. just do currentRow++ if all cells are
+                 * to show time.
+                 */
+                currentRow = currentRow + 2;
+            }
+        }
+    }
+
+    /**
+     * Creates the black sheet that will contain the group schedule.
+     *
+     * @param hr12
+     *            true if 12 hour time, false if 24 hour time. param satSun true
+     *            if includes saturday and sunday, false if not.
+     * @param fileName
+     *            name of the file.
+     * @param scheduleTimeFrame
+     *            array of length 2, contains the start hour and end hour of the
+     *            schedule to be created.
+     *
+     */
+    public static void createSheetTemplate(String fileName, /*
+                                                             * boolean satSun,
+                                                             */
+            boolean hr12, int[] scheduleTimeFrame) throws Exception {
+//TODO: add in the days of the week. Implement 5 day or 7 day schedule functionality
+
+        //Create Blank workbook
+        Workbook excelFile = new XSSFWorkbook();
+
+        //Create file system given specific name
+        FileOutputStream exOut = new FileOutputStream(new File(fileName));
+
+        //put this between exout and exout.close()
+        Sheet page1 = excelFile.createSheet("Schedule Table");
+
+        if (hr12) {
+            generate12HrTime(excelFile, page1, scheduleTimeFrame);
+        } else {
+            generate24HrTime(excelFile, page1, scheduleTimeFrame);
+        }
+
+        //close streams
+        excelFile.write(exOut);
+        excelFile.close();
+
+    }
+
+    /**
      * Takes the time attribute and figures out where on the table (in rows) to
      * put the cell.
      *
@@ -592,12 +1044,12 @@ public final class ExcelMakerConsole {
      * @param args
      *            the command line arguments
      */
-    public static void main(String[] args) {
+    public static void main(String[] args) throws Exception {
         SimpleReader in = new SimpleReader1L();
         SimpleWriter out = new SimpleWriter1L();
 
         //name of file, also name of root node
-        String root = "xmlSchedule.xml";
+        String root = "timeColumnTest.xml";
         SimpleWriter fileOut = new SimpleWriter1L(root);
 
         /*
@@ -711,6 +1163,12 @@ public final class ExcelMakerConsole {
          * output root footer
          */
         fileOut.println("</" + root + ">");
+
+        String sheetName = promptSheetName(in, out);
+        boolean use12Hr = promptHrFormat(in, out);
+        int[] scheduleTimeFrame = promptTimeFrame(in, out);
+
+        createSheetTemplate(sheetName, use12Hr, scheduleTimeFrame);
 
         /*
          * Close input and output streams
