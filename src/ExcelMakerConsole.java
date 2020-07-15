@@ -1,10 +1,17 @@
 import java.io.File;
 import java.io.FileOutputStream;
 
+import org.apache.poi.ss.usermodel.BorderStyle;
 import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.CellStyle;
+import org.apache.poi.ss.usermodel.FillPatternType;
+import org.apache.poi.ss.usermodel.HorizontalAlignment;
+import org.apache.poi.ss.usermodel.IndexedColors;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.ss.util.CellRangeAddress;
+import org.apache.poi.ss.util.RegionUtil;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 import components.set.Set;
@@ -40,6 +47,12 @@ public final class ExcelMakerConsole {
      */
     private static final String[] SCHOOLDAYS = { "Monday", "Tuesday",
             "Wednesday", "Thursday", "Friday" };
+
+    /**
+     * Array of all days of the week.
+     */
+    private static final String[] ALLDAYS = { "Monday", "Tuesday", "Wednesday",
+            "Thursday", "Friday", "Saturday", "Sunday" };
 
     /**
      * Constant that holds the number of class types.
@@ -593,94 +606,7 @@ public final class ExcelMakerConsole {
     }
 
     /**
-     * Prompts the user on info such as whether to use 24 or 12 hr time, whether
-     * to have a 5 or 7 day week, and the name of the file.
-     *
-     * @param in
-     *            input stream
-     * @param out
-     *            output stream
-     * @return boolean value, 12hr time if true, 24hr time if false
-     */
-    private static boolean promptHrFormat(SimpleReader in, SimpleWriter out) {
-
-        //Variables
-        boolean twelveTime;
-        String userInput = "placeholder";
-
-        out.println("");
-
-        /*
-         * Gets user input
-         */
-        while (!(userInput.equals("0") || userInput.equals("1"))) {
-
-            //prompt for 12 hour or 24 hour time
-            out.print(
-                    "Use 12-hour time (1) or 24-hour time (0) on the schedule: ");
-
-            //read and record user input
-            userInput = in.nextLine();
-
-            //in case user does not input 1 or 0
-            if (!(userInput.equals("0") || userInput.equals("1"))) {
-                out.println();
-                out.println("Please input either (1) for 12 hour time");
-                out.println("or (0) for 24 hour time **No parenthesis**");
-                out.println();
-            }
-        }
-        twelveTime = userInput.equals("1");
-
-        return twelveTime;
-    }
-
-    /**
-     * Prompts the user on info such as whether to use 24 or 12 hr time, whether
-     * to have a 5 or 7 day week, and the name of the file.
-     *
-     * @param in
-     *            input stream
-     * @param out
-     *            output stream
-     * @return boolean, 5 day week if true, 7 day week if false
-     */
-    private static boolean promptWeekFormat(SimpleReader in, SimpleWriter out) {
-
-        //
-        boolean fivedays;
-        String userInput = "placeholder";
-
-        out.println("");
-
-        /*
-         * Gets user input
-         */
-        while (!(userInput.equals("0") || userInput.equals("1"))) {
-
-            //prompt for 12 hour or 24 hour time
-            out.print(
-                    "Use 5 day week (1) or 7 day week (0) format on the schedule: ");
-
-            //read and record user input
-            userInput = in.nextLine();
-
-            //in case user does not input 1 or 0
-            if (!(userInput.equals("0") || userInput.equals("1"))) {
-                out.println();
-                out.println("Please input either (1) for 5 day week format");
-                out.println("or (0) for 7 day week format **No parenthesis**");
-                out.println();
-            }
-        }
-        fivedays = userInput.equals("1");
-
-        return fivedays;
-    }
-
-    /**
-     * Prompts the user on info such as whether to use 24 or 12 hr time, whether
-     * to have a 5 or 7 day week, and the name of the file.
+     * Prompts the user on the name of the file.
      *
      * @param in
      *            input stream
@@ -741,14 +667,157 @@ public final class ExcelMakerConsole {
     }
 
     /**
-     * Prompts the user on info such as whether to use 24 or 12 hr time, whether
-     * to have a 5 or 7 day week, and the name of the file.
+     * Prompts the user on whether to have a 7 or 5 day week.
      *
      * @param in
      *            input stream
      * @param out
      *            output stream
-     * @return a String to be used as the file name of the schedule
+     * @return boolean, 7 day week if true, 5 day week if false
+     */
+    private static boolean promptWeekFormat(SimpleReader in, SimpleWriter out) {
+
+        //
+        boolean sevenDays;
+        String userInput = "placeholder";
+
+        out.println("");
+
+        /*
+         * Gets user input
+         */
+        while (!(userInput.equals("0") || userInput.equals("1"))) {
+
+            //prompt for 7 or 5 day week
+            out.print(
+                    "Use 7 day week (1) or 5 day week (0) format on the schedule: ");
+
+            //read and record user input
+            userInput = in.nextLine();
+
+            //in case user does not input 1 or 0
+            if (!(userInput.equals("0") || userInput.equals("1"))) {
+                out.println();
+                out.println("Please input either (1) for 7 day week format");
+                out.println("or (0) for 5 day week format **No parenthesis**");
+                out.println();
+            }
+        }
+        sevenDays = userInput.equals("1");
+
+        return sevenDays;
+    }
+
+    /**
+     * Generates the day row with a full seven day week.
+     *
+     * @param file
+     *            The workbook being worked in. The actual excel file
+     * @param sheet
+     *            The specific sheet or page in the file being worked on
+     * @param sevenDays
+     *            Boolean, if true, utilize 7 day week format, if false, utilize
+     *            5 day week format
+     * @param numOfStudents
+     *            The number of students included in the schedule.
+     * @param basicStyle
+     *            Basic formatting style to be used on row of week days
+     */
+    private static void generateWeekRow(Workbook file, Sheet sheet,
+            boolean sevenDays, int numOfStudents, CellStyle basicStyle) {
+
+        //start column B
+        int startColumn = 1;
+        int endColumn = startColumn + numOfStudents - 1;
+        Row row = sheet.createRow(0);
+        Cell cell = row.createCell(startColumn);
+
+        /*
+         * Create variable dayFormat, which will alias either ALLDAYS or
+         * SCHOOLDAYS depending on desire for 7 day week or 5 day week.
+         */
+        String[] dayFormat;
+        if (sevenDays) {
+            dayFormat = ALLDAYS;
+        } else {
+            dayFormat = SCHOOLDAYS;
+        }
+
+        for (String day : dayFormat) {
+
+            //begin in the start column
+            cell = row.createCell(startColumn);
+            //put in the name of the day of the week
+            cell.setCellValue(day);
+            //set the style of the merged cell
+            cell.setCellStyle(basicStyle);
+
+            //specify the range in which to merge the cells
+            CellRangeAddress dayColumnRange = new CellRangeAddress(0, 0,
+                    startColumn, endColumn);
+
+            //merge however many cells as there are students
+            sheet.addMergedRegion(dayColumnRange);
+            RegionUtil.setBorderBottom(BorderStyle.MEDIUM, dayColumnRange,
+                    sheet);
+
+            //refresh the start and end columns
+            startColumn = startColumn + numOfStudents;
+            endColumn = endColumn + numOfStudents;
+        }
+
+    }
+
+    /**
+     * Prompts the user on info such as whether to use 24 or 12 hr time.
+     *
+     * @param in
+     *            input stream
+     * @param out
+     *            output stream
+     * @return boolean value, 12hr time if true, 24hr time if false
+     */
+    private static boolean promptHrFormat(SimpleReader in, SimpleWriter out) {
+
+        //Variables
+        boolean twelveTime;
+        String userInput = "placeholder";
+
+        out.println("");
+
+        /*
+         * Gets user input
+         */
+        while (!(userInput.equals("0") || userInput.equals("1"))) {
+
+            //prompt for 12 hour or 24 hour time
+            out.print(
+                    "Use 12-hour time (1) or 24-hour time (0) on the schedule: ");
+
+            //read and record user input
+            userInput = in.nextLine();
+
+            //in case user does not input 1 or 0
+            if (!(userInput.equals("0") || userInput.equals("1"))) {
+                out.println();
+                out.println("Please input either (1) for 12 hour time");
+                out.println("or (0) for 24 hour time **No parenthesis**");
+                out.println();
+            }
+        }
+        twelveTime = userInput.equals("1");
+
+        return twelveTime;
+    }
+
+    /**
+     * Prompts the user on what time frame the schedule should display.
+     *
+     * @param in
+     *            input stream
+     * @param out
+     *            output stream
+     * @return an int array length 2 with start hour and end hour in 24hr time
      */
     private static int[] promptTimeFrame(SimpleReader in, SimpleWriter out) {
 
@@ -873,9 +942,11 @@ public final class ExcelMakerConsole {
      *            The sheet for the time column to be generated in.
      * @param timeFrame
      *            time frame to build the schedule around.
+     * @param timeColumnStyle
+     *            Cell Style to be used on the time column
      */
     private static void generate12HrTime(Workbook file, Sheet sheet,
-            int[] timeFrame) {
+            int[] timeFrame, CellStyle timeColumnStyle) {
         //Initialize the row and cell
         Row row = sheet.createRow(0);
         Cell cell = row.createCell(0);
@@ -894,6 +965,7 @@ public final class ExcelMakerConsole {
             for (int j = 0; j < 2; j++) {
                 row = sheet.createRow(currentRow);
                 cell = row.createCell(0);
+                cell.setCellStyle(timeColumnStyle);
 
                 //ensure :00 is printed instead of :0
                 if (j == 0) {
@@ -945,9 +1017,11 @@ public final class ExcelMakerConsole {
      *            The sheet for the time column to be generated in.
      * @param timeFrame
      *            time frame to build the schedule around
+     * @param timeColumnStyle
+     *            Cell Style to be used on the time column
      */
     private static void generate24HrTime(Workbook file, Sheet sheet,
-            int[] timeFrame) {
+            int[] timeFrame, CellStyle timeColumnStyle) {
         //Initialize the row and cell
         Row row = sheet.createRow(0);
         Cell cell = row.createCell(0);
@@ -964,6 +1038,7 @@ public final class ExcelMakerConsole {
             for (int j = 0; j < 2; j++) {
                 row = sheet.createRow(currentRow);
                 cell = row.createCell(0);
+                cell.setCellStyle(timeColumnStyle);
 
                 //ensure :00 is printed instead of :0
                 if (j == 0) {
@@ -985,22 +1060,66 @@ public final class ExcelMakerConsole {
     }
 
     /**
+     * Spruces up the sheet template with the styles for the schedule.
+     *
+     * @param file
+     *            The workbook being worked in. In other words, the excel file
+     *            being worked in
+     * @param sheet
+     *            The sheet being worked in.
+     * @param basicStyle
+     *            The basic style that all cells will follow.
+     * @return an array of all the cell styles to be used.
+     */
+    private static CellStyle[] generateStyle(Workbook file, Sheet sheet,
+            CellStyle basicStyle) {
+
+        //Declare CellStyle array return variable
+        CellStyle[] allStyles = new CellStyle[3];
+
+        //Create style for time column
+        CellStyle timeColumnStyle = file.createCellStyle();
+        timeColumnStyle.cloneStyleFrom(basicStyle);
+        timeColumnStyle.setFillPattern(FillPatternType.SOLID_FOREGROUND);
+        timeColumnStyle.setFillForegroundColor(
+                IndexedColors.GREY_25_PERCENT.getIndex());
+        timeColumnStyle.setBorderRight(BorderStyle.THIN);
+
+        //Create style for last column per day (to add vertical bar)
+        CellStyle lastColumnStyle = file.createCellStyle();
+        lastColumnStyle.cloneStyleFrom(basicStyle);
+        lastColumnStyle.setBorderRight(BorderStyle.THIN);
+
+        allStyles[0] = basicStyle;
+        allStyles[1] = timeColumnStyle;
+        allStyles[2] = lastColumnStyle;
+
+        return allStyles;
+
+    }
+
+    /**
      * Creates the black sheet that will contain the group schedule.
      *
-     * @param hr12
-     *            true if 12 hour time, false if 24 hour time. param satSun true
-     *            if includes saturday and sunday, false if not.
      * @param fileName
      *            name of the file.
+     * @param satSun
+     *            true if includes saturday and sunday, false if not.
+     * @param hr12
+     *            true if 12 hour time, false if 24 hour time.
+     *
      * @param scheduleTimeFrame
      *            array of length 2, contains the start hour and end hour of the
      *            schedule to be created.
+     * @param numOfStudents
+     *            the number of students to be included in the group schedule
+     *
      *
      */
-    public static void createSheetTemplate(String fileName, /*
-                                                             * boolean satSun,
-                                                             */
-            boolean hr12, int[] scheduleTimeFrame) throws Exception {
+    public static void createSheetTemplate(String fileName, boolean satSun,
+
+            boolean hr12, int[] scheduleTimeFrame, int numOfStudents)
+            throws Exception {
 //TODO: add in the days of the week. Implement 5 day or 7 day schedule functionality
 
         //Create Blank workbook
@@ -1012,11 +1131,20 @@ public final class ExcelMakerConsole {
         //put this between exout and exout.close()
         Sheet page1 = excelFile.createSheet("Schedule Table");
 
+        //create basic style
+        CellStyle style1 = excelFile.createCellStyle();
+        style1.setWrapText(true);
+        style1.setAlignment(HorizontalAlignment.CENTER);
+
+        CellStyle[] allStyles = generateStyle(excelFile, page1, style1);
+
         if (hr12) {
-            generate12HrTime(excelFile, page1, scheduleTimeFrame);
+            generate12HrTime(excelFile, page1, scheduleTimeFrame, allStyles[1]);
         } else {
-            generate24HrTime(excelFile, page1, scheduleTimeFrame);
+            generate24HrTime(excelFile, page1, scheduleTimeFrame, allStyles[1]);
         }
+
+        generateWeekRow(excelFile, page1, satSun, numOfStudents, allStyles[0]);
 
         //close streams
         excelFile.write(exOut);
@@ -1166,9 +1294,11 @@ public final class ExcelMakerConsole {
 
         String sheetName = promptSheetName(in, out);
         boolean use12Hr = promptHrFormat(in, out);
+        boolean sevenDayWeek = promptWeekFormat(in, out);
         int[] scheduleTimeFrame = promptTimeFrame(in, out);
 
-        createSheetTemplate(sheetName, use12Hr, scheduleTimeFrame);
+        createSheetTemplate(sheetName, use12Hr, sevenDayWeek, scheduleTimeFrame,
+                numOfPeople);
 
         /*
          * Close input and output streams

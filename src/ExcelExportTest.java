@@ -1,6 +1,7 @@
 import java.io.File;
 import java.io.FileOutputStream;
 
+import org.apache.poi.ss.usermodel.BorderStyle;
 /*
  * for some reason,
  * eclipse does not automatically import 'org.apache.poi.ss.usermodel.Sheet'
@@ -8,10 +9,14 @@ import java.io.FileOutputStream;
  */
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellStyle;
+import org.apache.poi.ss.usermodel.FillPatternType;
 import org.apache.poi.ss.usermodel.HorizontalAlignment;
+import org.apache.poi.ss.usermodel.IndexedColors;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.ss.util.CellRangeAddress;
+import org.apache.poi.ss.util.RegionUtil;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 import components.simplereader.SimpleReader;
@@ -61,6 +66,24 @@ public final class ExcelExportTest {
 
         //put this between exout and exout.close()
         Sheet page1 = excelFile.createSheet("Schedule Table");
+
+//setting cell style
+        CellStyle style1 = excelFile.createCellStyle();
+
+        style1.setWrapText(true);
+        style1.setAlignment(HorizontalAlignment.CENTER);
+
+        CellStyle timeColumnStyle = excelFile.createCellStyle();
+        timeColumnStyle.cloneStyleFrom(style1);
+        //MUST SET FILL PATTERN or else no color shown
+        timeColumnStyle.setFillPattern(FillPatternType.SOLID_FOREGROUND);
+        timeColumnStyle.setFillForegroundColor(
+                IndexedColors.GREY_25_PERCENT.getIndex());
+
+        CellStyle dayRowStyle = excelFile.createCellStyle();
+        dayRowStyle.cloneStyleFrom(style1);
+//        dayRowStyle.setBorderBottom(BorderStyle.MEDIUM);
+//        dayRowStyle.setBottomBorderColor(IndexedColors.ROYAL_BLUE.getIndex());
 
         //Initialize the row
         Row row = page1.createRow(0);
@@ -112,6 +135,7 @@ public final class ExcelExportTest {
             for (int j = 0; j < 2; j++) {
                 row = page1.createRow(currentRow);
                 cell = row.createCell(0);
+                cell.setCellStyle(timeColumnStyle);
 
                 //ensure :00 is printed instead of :0
                 if (j == 0) {
@@ -159,10 +183,27 @@ public final class ExcelExportTest {
 
 //        cell.setCellValue("This is Cell 1A");
 
-        CellStyle style1 = excelFile.createCellStyle();
+        //Add the days row
+        int startColumn = 1;
+        int endColumn = 4;
+        String[] days = { "Monday", "Tuesday", "Wednesday", "Thursday",
+                "Friday" };
+        row = page1.createRow(0);
+        for (int i = 0; i < 5; i++) {
 
-        style1.setWrapText(true);
-        style1.setAlignment(HorizontalAlignment.CENTER);
+            cell.setCellStyle(dayRowStyle);
+            cell = row.createCell(startColumn);
+            cell.setCellValue(days[i]);
+            cell.setCellStyle(style1);
+            CellRangeAddress dayColumnRange = new CellRangeAddress(0, 0,
+                    startColumn, endColumn);
+            page1.addMergedRegion(dayColumnRange);
+            RegionUtil.setBorderBottom(BorderStyle.MEDIUM, dayColumnRange,
+                    page1);
+            startColumn = startColumn + 4;
+            endColumn = endColumn + 4;
+        }
+
 //        cell.setCellStyle(style1);
 
         //Merged cell
@@ -183,10 +224,10 @@ public final class ExcelExportTest {
 
         out.println("file created successfully");
 
-        int[] basicTimeFrame = { 10, 15 };
+        int[] basicTimeFrame = { 6, 22 };
 
         ExcelMakerConsole.createSheetTemplate("createSheetTemplateTest.xlsx",
-                true, basicTimeFrame);
+                true, true, basicTimeFrame, 3);
         in.close();
         out.close();
     }
