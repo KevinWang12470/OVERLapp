@@ -1349,8 +1349,8 @@ public final class ExcelMakerConsole {
 
         //For some reason cell C3 does not fill in its right border
         //TODO: STILL DOESN'T FILL BORDER
-        RegionUtil.setBorderRight(BorderStyle.MEDIUM,
-                new CellRangeAddress(2, 2, 2, 2), sheet);
+//        RegionUtil.setBorderRight(BorderStyle.MEDIUM,
+//                new CellRangeAddress(2, 2, 2, 2), sheet);
 
     }
 
@@ -1652,8 +1652,8 @@ public final class ExcelMakerConsole {
         boolean sevenDayWeek = promptWeekFormat(in, out);
         int[] scheduleTimeFrame = promptTimeFrame(in, out);
 
-        createSheetTemplate("xmlSchedule.xml", sheetName, use12Hr, sevenDayWeek,
-                scheduleTimeFrame, numOfPeople);
+        createSheetTemplate("actualSchedule.xml", sheetName, use12Hr,
+                sevenDayWeek, scheduleTimeFrame, numOfPeople);
 
         /*
          * Close input and output streams

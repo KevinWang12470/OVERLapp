@@ -1,1 +1,29 @@
 <actualSchedule.xml>
+	<student name = "Kevin" numberOfClasses = "2"> 
+		<class className = "CSE 2221">
+			<LEC start = "3:00PM" end = "4:00PM" location = "Dreese 225" frequency = "01010" />
+			<LAB start = "3:00PM" end = "4:00PM" location = "Dreese 445" frequency = "00101" />
+		</class>
+		<class className = "Math 2568">
+			<LEC start = "12:25PM" end = "1:30PM" location = "Knowlton 131" frequency = "10101" />
+		</class>
+	</student>
+	<student name = "Vincente" numberOfClasses = "1"> 
+		<class className = "Bio 2334">
+			<LEC start = "9:00AM" end = "10:00AM" location = "Koffolt somewhere" frequency = "10101" />
+			<REC start = "2:15PM" end = "3:15PM" location = "McPherson 123" frequency = "01000" />
+			<LAB start = "6:40PM" end = "9:40PM" location = "McPherson 321" frequency = "00010" />
+		</class>
+	</student>
+	<student name = "Catherine" numberOfClasses = "3"> 
+		<class className = "Econ 3314">
+			<LEC start = "4:20PM" end = "5:20PM" location = "Hitchcock 131" frequency = "10101" />
+		</class>
+		<class className = "Philos 2730">
+			<LEC start = "11:00AM" end = "12:00PM" location = "Derby Hall 231" frequency = "11010" />
+		</class>
+		<class className = "Fortune 500 Club">
+			<LAB start = "7:00PM" end = "9:00PM" location = "Hitchcock 131" frequency = "00010" />
+		</class>
+	</student>
+</actualSchedule.xml>
