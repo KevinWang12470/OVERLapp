@@ -9,6 +9,7 @@ import org.apache.poi.ss.usermodel.HorizontalAlignment;
 import org.apache.poi.ss.usermodel.IndexedColors;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.VerticalAlignment;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.ss.util.CellRangeAddress;
 import org.apache.poi.ss.util.RegionUtil;
@@ -21,6 +22,8 @@ import components.simplereader.SimpleReader1L;
 import components.simplewriter.SimpleWriter;
 import components.simplewriter.SimpleWriter1L;
 import components.utilities.FormatChecker;
+import components.xmltree.XMLTree;
+import components.xmltree.XMLTree1;
 
 /**
  * Put a short phrase describing the program here.
@@ -55,6 +58,22 @@ public final class ExcelMakerConsole {
             "Thursday", "Friday", "Saturday", "Sunday" };
 
     /**
+     * int constants that refer to their corresponding cell styles in
+     * allStyles[].
+     */
+    private static final int BASICTEMPLATE = 0, TIMECOLUMNTEMPLATE = 1,
+            LASTCOLUMNTEMPLATE = 2, SESSIONTEMPLATE = 3,
+            ALTTIMECOLUMNTEMPLATE = 4;
+
+    /**
+     * Array of color indices that will be used to fill the foreground of
+     * student class sessions.
+     */
+    private static final short[] COLORS = { IndexedColors.LIGHT_BLUE.getIndex(),
+            IndexedColors.LIGHT_GREEN.getIndex(),
+            IndexedColors.LAVENDER.getIndex() };
+
+    /**
      * Constant that holds the number of class types.
      */
     private static final int NUMOFCLASSTYPES = 3;
@@ -73,6 +92,11 @@ public final class ExcelMakerConsole {
      * The half hour mark.
      */
     private static final int THIRTY = 30;
+
+    /**
+     * The Column Width equivalent to 15 characters.
+     */
+    private static final int COLUMNWIDTH = 18 * 256;
 
     /**
      * Used in promptTimeFrame method when prompting for start time and end
@@ -720,11 +744,11 @@ public final class ExcelMakerConsole {
      *            5 day week format
      * @param numOfStudents
      *            The number of students included in the schedule.
-     * @param basicStyle
-     *            Basic formatting style to be used on row of week days
+     * @param allStyles
+     *            CellStyle array with all usable style templates
      */
     private static void generateWeekRow(Workbook file, Sheet sheet,
-            boolean sevenDays, int numOfStudents, CellStyle basicStyle) {
+            boolean sevenDays, int numOfStudents, CellStyle[] allStyles) {
 
         //start column B
         int startColumn = 1;
@@ -747,14 +771,30 @@ public final class ExcelMakerConsole {
 
             //begin in the start column
             cell = row.createCell(startColumn);
+
+            //set width of schedule
+            for (int i = 0; i < numOfStudents; i++) {
+                sheet.setColumnWidth(startColumn + i, COLUMNWIDTH);
+            }
+
             //put in the name of the day of the week
             cell.setCellValue(day);
             //set the style of the merged cell
-            cell.setCellStyle(basicStyle);
+            cell.setCellStyle(allStyles[BASICTEMPLATE]);
 
             //specify the range in which to merge the cells
             CellRangeAddress dayColumnRange = new CellRangeAddress(0, 0,
                     startColumn, endColumn);
+
+//            /*
+//             * insert the borders between days. minus two because last row num
+//             * goes two too far.
+//             */
+//            for (int j = 1; j < sheet.getLastRowNum() - 2; j++) {
+//                Row borderRow = sheet.getRow(j);
+//                Cell borderCell = borderRow.createCell(endColumn);
+//                borderCell.setCellStyle(allStyles[LASTCOLUMNTEMPLATE]);
+//            }
 
             //merge however many cells as there are students
             sheet.addMergedRegion(dayColumnRange);
@@ -942,11 +982,11 @@ public final class ExcelMakerConsole {
      *            The sheet for the time column to be generated in.
      * @param timeFrame
      *            time frame to build the schedule around.
-     * @param timeColumnStyle
-     *            Cell Style to be used on the time column
+     * @param allStyles
+     *            An array of all the cell style templates we can use
      */
     private static void generate12HrTime(Workbook file, Sheet sheet,
-            int[] timeFrame, CellStyle timeColumnStyle) {
+            int[] timeFrame, CellStyle[] allStyles) {
         //Initialize the row and cell
         Row row = sheet.createRow(0);
         Cell cell = row.createCell(0);
@@ -962,47 +1002,71 @@ public final class ExcelMakerConsole {
             /*
              * if desired, all cells can show time by setting j < 4
              */
-            for (int j = 0; j < 2; j++) {
+            for (int j = 0; j < 4; j++) {
                 row = sheet.createRow(currentRow);
                 cell = row.createCell(0);
-                cell.setCellStyle(timeColumnStyle);
 
                 //ensure :00 is printed instead of :0
                 if (j == 0) {
 
+                    //set the cell style
+                    cell.setCellStyle(allStyles[TIMECOLUMNTEMPLATE]);
+
                     //if in the 12 AM area
                     if (i == 0) {
                         cell.setCellValue("12:00AM");
-                    }
-                    //if PM
-                    if (i > TWELVE) {
+
+                        //if PM
+                    } else if (i > TWELVE) {
                         cell.setCellValue(i - TWELVE + ":00PM");
 
-                    } /* if AM */ else {
+                        //if 12PM
+                    } else if (i == TWELVE) {
+                        cell.setCellValue(i + ":00PM");
+
+                        /* if AM */
+                    } else {
                         cell.setCellValue(i + ":00AM");
                     }
 
-                } /* ensures time column ends at end:00 */ else if (i != endTime) {
+                    /* ensures time column ends at end:00 */
+                } else if (i != endTime && j == 2) {
 
-                    //in this format in case all cells show time (j * 15)
+                    //set the cell style
+                    cell.setCellStyle(allStyles[TIMECOLUMNTEMPLATE]);
+
+                    //in this format in case all cells show time (j * FIFTEEN)
                     //if 12 AM
                     if (i == 0) {
-                        cell.setCellValue("12:" + j * THIRTY + "AM");
+                        cell.setCellValue("12:" + THIRTY + "AM");
+
+                        //if PM
+                    } else if (i > TWELVE) {
+                        cell.setCellValue(i - TWELVE + ":" + THIRTY + "PM");
+
+                        //if 12PM
+                    } else if (i == TWELVE) {
+                        cell.setCellValue(i + ":" + THIRTY + "PM");
+
+                        /* if AM */
+                    } else {
+                        cell.setCellValue(i + ":" + THIRTY + "AM");
                     }
-                    //if PM
-                    if (i > TWELVE) {
-                        cell.setCellValue(i - TWELVE + ":" + j * THIRTY + "PM");
-                    } /* if AM */ else {
-                        cell.setCellValue(i + ":" + j * THIRTY + "AM");
-                    }
+
+                    //if :15 or :45. Make a blank cell
+                } else if (i != endTime) {
+                    cell.setCellStyle(allStyles[ALTTIMECOLUMNTEMPLATE]);
+                    cell.setCellValue(" ");
                 }
 
                 /*
                  * move down the sheet according to the timeline. Each cell
-                 * counts as 15 minutes. just do currentRow++ if all cells are
-                 * to show time.
+                 * counts as 15 minutes. Doing currentRow++ in order to create
+                 * blank cells. Pertinent when adding the actual classes to the
+                 * blank schedule. We'll be able to use getRow instead of
+                 * createRow (which would delete everything else in that row).
                  */
-                currentRow = currentRow + 2;
+                currentRow++;
 
             }
         }
@@ -1017,11 +1081,11 @@ public final class ExcelMakerConsole {
      *            The sheet for the time column to be generated in.
      * @param timeFrame
      *            time frame to build the schedule around
-     * @param timeColumnStyle
-     *            Cell Style to be used on the time column
+     * @param allStyles
+     *            An array of all the cell style templates we can use
      */
     private static void generate24HrTime(Workbook file, Sheet sheet,
-            int[] timeFrame, CellStyle timeColumnStyle) {
+            int[] timeFrame, CellStyle[] allStyles) {
         //Initialize the row and cell
         Row row = sheet.createRow(0);
         Cell cell = row.createCell(0);
@@ -1035,26 +1099,34 @@ public final class ExcelMakerConsole {
             /*
              * if desired, all cells can show time by setting j < 4
              */
-            for (int j = 0; j < 2; j++) {
+            for (int j = 0; j < 4; j++) {
                 row = sheet.createRow(currentRow);
                 cell = row.createCell(0);
-                cell.setCellStyle(timeColumnStyle);
+                cell.setCellStyle(allStyles[TIMECOLUMNTEMPLATE]);
 
                 //ensure :00 is printed instead of :0
                 if (j == 0) {
                     cell.setCellValue(i + ":00");
 
-                } /* ensures time column ends at end:00 */ else if (i != endTime) {
+                    /* ensures time column ends at end:00 */
+                } else if (i != endTime) {
 
-                    //in this format in case all cells show time (j * 15)
-                    cell.setCellValue(i + ":" + j * THIRTY);
+                    if (j == 2) {
+                        //in this format in case all cells show time (j * FIFTEEN)
+                        cell.setCellValue(i + ":" + THIRTY);
+                    } else {
+                        cell.setCellValue(" ");
+                        cell.setCellStyle(allStyles[ALTTIMECOLUMNTEMPLATE]);
+                    }
                 }
                 /*
                  * move down the sheet according to the timeline. Each cell
-                 * counts as 15 minutes. just do currentRow++ if all cells are
-                 * to show time.
+                 * counts as 15 minutes. Doing currentRow++ in order to create
+                 * blank cells. Pertinent when adding the actual classes to the
+                 * blank schedule. We'll be able to use getRow instead of
+                 * createRow (which would delete everything else in that row).
                  */
-                currentRow = currentRow + 2;
+                currentRow++;
             }
         }
     }
@@ -1074,25 +1146,34 @@ public final class ExcelMakerConsole {
     private static CellStyle[] generateStyle(Workbook file, Sheet sheet,
             CellStyle basicStyle) {
 
-        //Declare CellStyle array return variable
-        CellStyle[] allStyles = new CellStyle[3];
-
         //Create style for time column
+        CellStyle altTimeColumnStyle = file.createCellStyle();
+        altTimeColumnStyle.cloneStyleFrom(basicStyle);
+        altTimeColumnStyle.setFillPattern(FillPatternType.SOLID_FOREGROUND);
+        altTimeColumnStyle.setBorderRight(BorderStyle.MEDIUM);
+        altTimeColumnStyle.setBorderLeft(BorderStyle.MEDIUM);
+        altTimeColumnStyle
+                .setFillForegroundColor(IndexedColors.WHITE.getIndex());
+
         CellStyle timeColumnStyle = file.createCellStyle();
-        timeColumnStyle.cloneStyleFrom(basicStyle);
-        timeColumnStyle.setFillPattern(FillPatternType.SOLID_FOREGROUND);
+        timeColumnStyle.cloneStyleFrom(altTimeColumnStyle);
         timeColumnStyle.setFillForegroundColor(
                 IndexedColors.GREY_25_PERCENT.getIndex());
-        timeColumnStyle.setBorderRight(BorderStyle.THIN);
 
         //Create style for last column per day (to add vertical bar)
         CellStyle lastColumnStyle = file.createCellStyle();
         lastColumnStyle.cloneStyleFrom(basicStyle);
-        lastColumnStyle.setBorderRight(BorderStyle.THIN);
+        lastColumnStyle.setBorderRight(BorderStyle.MEDIUM);
 
-        allStyles[0] = basicStyle;
-        allStyles[1] = timeColumnStyle;
-        allStyles[2] = lastColumnStyle;
+        //Create style template for class session regions
+        CellStyle sessionStyleTemplate = file.createCellStyle();
+        sessionStyleTemplate.cloneStyleFrom(basicStyle);
+        sessionStyleTemplate.setVerticalAlignment(VerticalAlignment.CENTER);
+        sessionStyleTemplate.setFillPattern(FillPatternType.SOLID_FOREGROUND);
+
+        //Initialize CellStyle array return variable
+        CellStyle[] allStyles = new CellStyle[] { basicStyle, timeColumnStyle,
+                lastColumnStyle, sessionStyleTemplate, altTimeColumnStyle };
 
         return allStyles;
 
@@ -1101,6 +1182,9 @@ public final class ExcelMakerConsole {
     /**
      * Creates the black sheet that will contain the group schedule.
      *
+     * @param xmlToRead
+     *            The name of the xml file that contains the information to be
+     *            put on the schedule
      * @param fileName
      *            name of the file.
      * @param satSun
@@ -1116,12 +1200,18 @@ public final class ExcelMakerConsole {
      *
      *
      */
-    public static void createSheetTemplate(String fileName, boolean satSun,
+    public static void createSheetTemplate(String xmlToRead, String fileName,
+            boolean satSun,
 
             boolean hr12, int[] scheduleTimeFrame, int numOfStudents)
             throws Exception {
-//TODO: add in the days of the week. Implement 5 day or 7 day schedule functionality
 
+        //TODO: increase frequency from 5days to 7days
+        //TODO: Maybe change the colors of the sessions or something
+        /*
+         * TODO: do not need numOfStudents argument, can derive that from
+         * xmlToRead
+         */
         //Create Blank workbook
         Workbook excelFile = new XSSFWorkbook();
 
@@ -1139,12 +1229,18 @@ public final class ExcelMakerConsole {
         CellStyle[] allStyles = generateStyle(excelFile, page1, style1);
 
         if (hr12) {
-            generate12HrTime(excelFile, page1, scheduleTimeFrame, allStyles[1]);
+            generate12HrTime(excelFile, page1, scheduleTimeFrame, allStyles);
         } else {
-            generate24HrTime(excelFile, page1, scheduleTimeFrame, allStyles[1]);
+            generate24HrTime(excelFile, page1, scheduleTimeFrame, allStyles);
         }
 
-        generateWeekRow(excelFile, page1, satSun, numOfStudents, allStyles[0]);
+        generateWeekRow(excelFile, page1, satSun, numOfStudents, allStyles);
+
+        markDayBorders(excelFile, page1, satSun, numOfStudents,
+                scheduleTimeFrame, allStyles);
+
+        addClassToSchedule(xmlToRead, excelFile, page1, numOfStudents, satSun,
+                scheduleTimeFrame, allStyles);
 
         //close streams
         excelFile.write(exOut);
@@ -1158,12 +1254,271 @@ public final class ExcelMakerConsole {
      *
      * @param classTime
      *            the time of the class (start or end)
+     * @param scheduleTimeFrame
+     *            The time frame that the schedule follows
      * @return the row number of that time slot
      */
-    private static int convertTimetoRow(String classTime) {
-        int rowIndex = 0;
-        //TODO: probably finish after parseTime.
+    private static int convertTimeToRow(String classTime,
+            int[] scheduleTimeFrame) {
+        int rowIndex = 1;
+        int[] classTimeFrame = parseTime(classTime);
+
+        /*
+         * calculate row index
+         */
+        //class start hour - schedule start hour * (cells in one hour block)
+        rowIndex = 1 + (classTimeFrame[0] - scheduleTimeFrame[0]) * 4;
+
+        /*
+         * calculate row index, class start minute versus :00, :15, :30, :45
+         */
+        // -7 <= time < +8
+
+        //:15
+        if (classTimeFrame[1] >= 8 && classTimeFrame[1] < 22) {
+            rowIndex++;
+        } else if (classTimeFrame[1] >= 22 && classTimeFrame[1] < 38) {
+            //:30
+            rowIndex = rowIndex + 2;
+        } else if (classTimeFrame[1] >= 38 && classTimeFrame[1] < 52) {
+            //:45
+            rowIndex = rowIndex + 3;
+        } else if (classTimeFrame[1] >= 52 && classTimeFrame[1] < 60) {
+            // +1:00
+            rowIndex = rowIndex + 4;
+        }
+
         return rowIndex;
+    }
+
+    /**
+     * Puts down the border between the days, {monday | tuesday | wednesday |
+     * etc.}.
+     *
+     * @param file
+     *            The Workbook being written in. Also known as the excel file
+     * @param sheet
+     *            The specific sheet being worked on.
+     *
+     * @param sevenDays
+     *            A boolean, if true, it's a 7 day week, if false it's a 5 day
+     *            week
+     * @param numOfPeople
+     *            The number of people in the schedule
+     * @param scheduleTimeFrame
+     *            The int array that shows the time frame that the schedule
+     *            follows.
+     * @param allStyles
+     *            The array of style template available for use
+     */
+    private static void markDayBorders(Workbook file, Sheet sheet,
+            boolean sevenDays, int numOfPeople, int[] scheduleTimeFrame,
+            CellStyle[] allStyles) {
+
+        //Initialize the start row variable
+        int startRow = 1;
+
+        //get the end frame of the schedule
+        String scheduleEndTime = scheduleTimeFrame[1] + ":00";
+
+        //Initialize the end row variable
+        int endRow = convertTimeToRow(scheduleEndTime, scheduleTimeFrame);
+
+        //determine whether 7 day week or 5 day week
+        int daysOfTheWeek = SCHOOLDAYS.length;
+
+        if (sevenDays) {
+            daysOfTheWeek = ALLDAYS.length;
+        }
+
+        for (int i = 0; i < daysOfTheWeek; i++) {
+
+            //update the current column AKA current day
+            int currentColumn = numOfPeople + i * numOfPeople;
+
+            /*
+             * Update the range of the border, which spans from the row that the
+             * time column beings to the row that the time column terminates.
+             */
+            CellRangeAddress borderLength = new CellRangeAddress(startRow,
+                    endRow, currentColumn, currentColumn);
+
+            //set the right border to medium
+            RegionUtil.setBorderRight(BorderStyle.MEDIUM, borderLength, sheet);
+        }
+
+        //For some reason cell C3 does not fill in its right border
+        //TODO: STILL DOESN'T FILL BORDER
+        RegionUtil.setBorderRight(BorderStyle.MEDIUM,
+                new CellRangeAddress(2, 2, 2, 2), sheet);
+
+    }
+
+    /**
+     * Adds a single(?) class to the schedule.
+     *
+     * @param xmlToRead
+     *            The xml file that is to be read.
+     * @param file
+     *            The workbook being written, also known as the excel file
+     * @param sheet
+     *            The specific sheet that is being worked on
+     * @param numOfPeople
+     *            number of students in the schedule
+     * @param sevenDays
+     *            boolean, if true, 7 day week, if false, 5 day week
+     * @param scheduleTimeFrame
+     *            int array of the time frame that the schedule follows
+     * @param allStyles
+     *            The array of all the cellstyle templates we can use
+     */
+    private static void addClassToSchedule(String xmlToRead, Workbook file,
+            Sheet sheet, int numOfPeople, boolean sevenDays,
+            int[] scheduleTimeFrame, CellStyle[] allStyles) {
+
+        //declare excel file navigation variables
+        Row startRow = sheet.getRow(1);
+        Cell startCell = startRow.createCell(1);
+
+        Row endRow = sheet.getRow(2);
+        Cell endCell = endRow.createCell(2);
+
+        //initialize the xml file to be read
+        String root = xmlToRead;
+        XMLTree rootNode = new XMLTree1(root);
+
+        CellStyle[] sessionColorStyles = new CellStyle[numOfPeople];
+
+        //iterate through the number of people
+        for (int i = 0; i < numOfPeople; i++) {
+
+            sessionColorStyles[i] = file.createCellStyle();
+            sessionColorStyles[i].cloneStyleFrom(allStyles[SESSIONTEMPLATE]);
+            sessionColorStyles[i].setFillForegroundColor(COLORS[i]);
+
+            //iterate through all the classes of each person
+            for (int j = 0; j < rootNode.child(i).numberOfChildren(); j++) {
+
+                //iterate through each session available per class
+                for (int k = 0; k < rootNode.child(i).child(j)
+                        .numberOfChildren(); k++) {
+
+                    //set start time row
+                    startRow = sheet
+                            .getRow(convertTimeToRow(
+                                    rootNode.child(i).child(j).child(k)
+                                            .attributeValue("start"),
+                                    scheduleTimeFrame));
+                    //set end time row
+                    endRow = sheet
+                            .getRow(convertTimeToRow(
+                                    rootNode.child(i).child(j).child(k)
+                                            .attributeValue("end"),
+                                    scheduleTimeFrame) - 1);
+
+                    //get class name
+                    String className = rootNode.child(i).child(j)
+                            .attributeValue("className");
+
+                    //get class type
+                    String classType = rootNode.child(i).child(j).child(k)
+                            .label();
+
+                    //get class start time
+                    String startTime = rootNode.child(i).child(j).child(k)
+                            .attributeValue("start");
+
+                    //get class end time
+                    String endTime = rootNode.child(i).child(j).child(k)
+                            .attributeValue("end");
+
+                    //get class location
+                    String location = rootNode.child(i).child(j).child(k)
+                            .attributeValue("location");
+
+                    //get class frequency
+                    String frequency = rootNode.child(i).child(j).child(k)
+                            .attributeValue("frequency");
+
+                    //iterate for every day of the week
+                    for (int l = 0; l < frequency.length(); l++) {
+
+                        //if class occurs that day, input info
+                        if (frequency.substring(l, l + 1).equals("1")) {
+
+                            //set starting cell
+                            startCell = startRow
+                                    .createCell(1 + i + (l * numOfPeople));
+
+                            //set ending cell
+                            endCell = endRow
+                                    .createCell(1 + i + (l * numOfPeople));
+
+                            /* set the cell style */
+                            startCell.setCellStyle(sessionColorStyles[i]);
+
+                            /*
+                             * Write information into desired cell
+                             */
+                            startCell.setCellValue(className + "  " + classType
+                                    + "  " + startTime + " - " + endTime + "  "
+                                    + location);
+
+                            /*
+                             * Add in the merged region of the class
+                             */
+                            CellRangeAddress classSessionRegion = new CellRangeAddress(
+                                    startRow.getRowNum(), endRow.getRowNum(),
+                                    startCell.getColumnIndex(),
+                                    endCell.getColumnIndex());
+                            sheet.addMergedRegion(classSessionRegion);
+
+                            //add borders
+                            RegionUtil.setBorderTop(BorderStyle.THIN,
+                                    classSessionRegion, sheet);
+                            RegionUtil.setBorderBottom(BorderStyle.THIN,
+                                    classSessionRegion, sheet);
+
+                            //if on farthest left column per day,
+                            if (i == 0) {
+
+                                //set left border bolder
+                                RegionUtil.setBorderLeft(BorderStyle.MEDIUM,
+                                        classSessionRegion, sheet);
+
+                                //if not on farthest left column per day,
+                            } else {
+
+                                //set left border thin
+                                RegionUtil.setBorderLeft(BorderStyle.THIN,
+                                        classSessionRegion, sheet);
+                            }
+
+                            //if on border column,
+                            if (i == numOfPeople - 1) {
+
+                                //set right border bolder
+                                RegionUtil.setBorderRight(BorderStyle.MEDIUM,
+                                        classSessionRegion, sheet);
+
+                                //if not far right column per day
+                            } else {
+
+                                //set right border thin
+                                RegionUtil.setBorderRight(BorderStyle.THIN,
+                                        classSessionRegion, sheet);
+                            }
+
+                        }
+
+                    }
+
+                }
+
+            }
+
+        }
+
     }
 
     /**
@@ -1177,7 +1532,7 @@ public final class ExcelMakerConsole {
         SimpleWriter out = new SimpleWriter1L();
 
         //name of file, also name of root node
-        String root = "timeColumnTest.xml";
+        String root = "actualSchedule.xml";
         SimpleWriter fileOut = new SimpleWriter1L(root);
 
         /*
@@ -1297,8 +1652,8 @@ public final class ExcelMakerConsole {
         boolean sevenDayWeek = promptWeekFormat(in, out);
         int[] scheduleTimeFrame = promptTimeFrame(in, out);
 
-        createSheetTemplate(sheetName, use12Hr, sevenDayWeek, scheduleTimeFrame,
-                numOfPeople);
+        createSheetTemplate("xmlSchedule.xml", sheetName, use12Hr, sevenDayWeek,
+                scheduleTimeFrame, numOfPeople);
 
         /*
          * Close input and output streams

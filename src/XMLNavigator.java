@@ -75,7 +75,6 @@ public final class XMLNavigator {
                     + " hours and " + timeStamp[1] + " minutes");
         }
 
-//TODO: False negative??
 //        out.println(ExcelMakerConsole.correctTime(timeExample, out));
 
         in.close();

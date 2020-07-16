@@ -10,7 +10,7 @@
 	</student>
 	<student name = "Vincente" numberOfClasses = "1"> 
 		<class className = "Chem 1225">
-			<LEC start = "11:00PM" end = "12:00AM" location = "Blackburn Hall" frequency = "10101" />
+			<LEC start = "11:00AM" end = "12:00PM" location = "Blackburn Hall" frequency = "10101" />
 			<REC start = "4:00PM" end = "5:00PM" location = "McPherson 241" frequency = "01000" />
 			<LAB start = "6:30PM" end = "9:30PM" location = "Scott Dining Hall" frequency = "00010" />
 		</class>

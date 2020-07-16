@@ -204,7 +204,17 @@ public final class ExcelExportTest {
             endColumn = endColumn + 4;
         }
 
+        row = page1.getRow(5);
+        cell = row.createCell(1);
+
+        //testing for concatenation (NO CONCATENATION)
+        cell.setCellValue("hello ");
+        //testing for newline capability (NO NEW LINE CAPABILITY)
+        cell.setCellValue("this is kevin \n how are you");
 //        cell.setCellStyle(style1);
+
+        out.println("row num: " + row.getRowNum());
+        out.println("column num: " + cell.getColumnIndex());
 
         //Merged cell
 //        row = page1.createRow(1);
@@ -226,8 +236,8 @@ public final class ExcelExportTest {
 
         int[] basicTimeFrame = { 6, 22 };
 
-        ExcelMakerConsole.createSheetTemplate("createSheetTemplateTest.xlsx",
-                true, true, basicTimeFrame, 3);
+        ExcelMakerConsole.createSheetTemplate("xmlSchedule.xml",
+                "createSheetTemplateTest.xlsx", true, true, basicTimeFrame, 2);
         in.close();
         out.close();
     }
