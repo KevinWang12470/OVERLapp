@@ -236,8 +236,8 @@ public final class ExcelExportTest {
 
         int[] basicTimeFrame = { 6, 22 };
 
-        ExcelMakerConsole.createSheetTemplate("actualSchedule.xml",
-                "actualSchedule.xlsx", true, false, basicTimeFrame, 3);
+        ExcelMakerConsole.createSheetTemplate("onePersonScheduleCheck.xml",
+                "onePersonScheduleCheck.xlsx", true, true, basicTimeFrame, 1);
         in.close();
         out.close();
     }

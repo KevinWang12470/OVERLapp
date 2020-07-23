@@ -40,10 +40,12 @@ public final class ExcelMakerConsole {
     }
 
     /**
-     * Array of the name of class types.
+     * Array of the name of class types. CHANGES MADE, added "Alternative" to
+     * CLASSTYPENAMES, added scenario to output class, changed check session
+     * existence to include alt event.
      */
     private static final String[] CLASSTYPENAMES = { "Lecture", "Recitation",
-            "Lab" };
+            "Lab", "Alternate Event" };
 
     /**
      * Array of school days.
@@ -115,6 +117,12 @@ public final class ExcelMakerConsole {
     private static final int[] DEFAULTTIMEFRAME = { 6, 22 };
 
     /**
+     * If the minute is between the numbers in this array, the cell corresponds
+     * to the :15, :30, :45, and +1:00 times respectively.
+     */
+    private static final int[] TIMEFRAMEBREAKDOWN = { 8, 22, 38, 52, 60 };
+
+    /**
      * String of separator characters, to separate hour vs minute.
      */
     private static final String /* SEPARATORS = ";':., ", */ DIGITS = "0123456789";
@@ -175,26 +183,56 @@ public final class ExcelMakerConsole {
          * declare classType boolean array. Used to determine existence of LEC
          * REC or LAB sessions per class
          */
-        boolean[] sessionExists = new boolean[NUMOFCLASSTYPES];
+        boolean[] sessionExists = new boolean[CLASSTYPENAMES.length];
 
-        for (int k = 0; k < NUMOFCLASSTYPES; k++) {
-            //initialize the temporary variable that holds user input
-            String yesOrNo = "placeHolder";
+        String yesOrNo = "placeHolder";
 
-            //keep asking if user does not input y/n
-            while (!yesOrNo.equals("y") && !yesOrNo.equals("n")) {
-                //prompt for input
-                out.print(CLASSTYPENAMES[k] + " (y/n): ");
-                //store input
-                yesOrNo = in.nextLine();
-                //if input is y/n, record in boolean array classType
-                if (yesOrNo.equals("y") || yesOrNo.equals("n")) {
-                    sessionExists[k] = (yesOrNo.equals("y"));
-                } else {
-                    //if input is not y/n, inform user
-                    out.println("Error. Please input either (y)es or (n)o");
+        //added
+        while (!yesOrNo.equals("y") && !yesOrNo.equals("n")) {
+            out.print("Is it a class? (y/n):");
+            yesOrNo = in.nextLine();
+
+            //if input is y/n, record in boolean array classType
+            if (yesOrNo.equals("y") || yesOrNo.equals("n")) {
+
+                //if event is not a class, mark all sessions false
+                if (yesOrNo.equals("n")) {
+                    for (int j = 0; j < NUMOFCLASSTYPES; j++) {
+                        sessionExists[j] = false;
+                    }
                 }
 
+                sessionExists[3] = (yesOrNo.equals("n"));
+            } else {
+                //if input is not y/n, inform user
+                out.println("Error. Please input either (y)es or (n)o");
+            }
+
+        }
+
+        //if it is a class, check for lecture, lab, or recitation
+        if (yesOrNo.equals("y")) {
+            //to here
+
+            for (int k = 0; k < NUMOFCLASSTYPES; k++) {
+                //initialize the temporary variable that holds user input
+                yesOrNo = "placeHolder";
+
+                //keep asking if user does not input y/n
+                while (!yesOrNo.equals("y") && !yesOrNo.equals("n")) {
+                    //prompt for input
+                    out.print(CLASSTYPENAMES[k] + " (y/n): ");
+                    //store input
+                    yesOrNo = in.nextLine();
+                    //if input is y/n, record in boolean array classType
+                    if (yesOrNo.equals("y") || yesOrNo.equals("n")) {
+                        sessionExists[k] = (yesOrNo.equals("y"));
+                    } else {
+                        //if input is not y/n, inform user
+                        out.println("Error. Please input either (y)es or (n)o");
+                    }
+
+                }
             }
         }
         return sessionExists;
@@ -324,7 +362,7 @@ public final class ExcelMakerConsole {
             //keep asking if user does not input y/n
             while (!inputChar.equals("y") && !inputChar.equals("n")) {
                 //prompt for input
-                out.print("Class on " + ALLDAYS[i] + " (y/n): ");
+                out.print("Occurs on " + ALLDAYS[i] + " (y/n): ");
                 //store input
                 inputChar = in.nextLine();
                 //if input is y/n, change String frequency accordingly
@@ -379,6 +417,13 @@ public final class ExcelMakerConsole {
             out.println("\t\t\t<LAB start = \"" + start[2] + "\" end = \""
                     + end[2] + "\" location = \"" + location[2]
                     + "\" frequency = \"" + frequency[2] + "\" />");
+        }
+
+        //added this if statement
+        if (type[3]) {
+            out.println("\t\t\t<ALT start = \"" + start[3] + "\" end = \""
+                    + end[3] + "\" location = \"" + location[3]
+                    + "\" frequency = \"" + frequency[3] + "\" />");
         }
 
         out.println("\t\t</class>");
@@ -1264,13 +1309,17 @@ public final class ExcelMakerConsole {
         //Put down the row at the top denoting what day of the week it is
         generateWeekRow(page1, satSun, numOfStudents, allStyles);
 
-        //put borders between each day column for easier reading
-        markDayBorders(page1, satSun, numOfStudents, scheduleTimeFrame,
-                allStyles);
-
         //Add all classes to the schedule
         addClassToSchedule(xmlToRead, page1, numOfStudents, satSun,
                 scheduleTimeFrame, sessionColorStyles);
+
+        //put borders between each day column for easier reading
+        /*
+         * MUST go after addClassToSchedule to avoid messing up borders between
+         * day columns for 1 person schedules
+         */
+        markDayBorders(page1, satSun, numOfStudents, scheduleTimeFrame,
+                allStyles);
 
         //Add the bottom portion of the schedule
         addScheduleBottom(xmlToRead, page1, satSun, sessionColorStyles);
@@ -1310,14 +1359,17 @@ public final class ExcelMakerConsole {
         //:15
         if (classTimeFrame[1] >= 8 && classTimeFrame[1] < 22) {
             rowIndex++;
-        } else if (classTimeFrame[1] >= 22 && classTimeFrame[1] < 38) {
+
             //:30
+        } else if (classTimeFrame[1] >= 22 && classTimeFrame[1] < 38) {
             rowIndex = rowIndex + 2;
-        } else if (classTimeFrame[1] >= 38 && classTimeFrame[1] < 52) {
+
             //:45
+        } else if (classTimeFrame[1] >= 38 && classTimeFrame[1] < 52) {
             rowIndex = rowIndex + 3;
-        } else if (classTimeFrame[1] >= 52 && classTimeFrame[1] < 60) {
+
             // +1:00
+        } else if (classTimeFrame[1] >= 52 && classTimeFrame[1] < 60) {
             rowIndex = rowIndex + 4;
         }
 
@@ -1407,34 +1459,32 @@ public final class ExcelMakerConsole {
         RegionUtil.setBorderBottom(BorderStyle.THIN, classSessionRegion, sheet);
 
         //if on farthest left column per day,
-        if (i == 0) {
+//        if (i == 0) {
+//
+//            //set left border bolder
+//            RegionUtil.setBorderLeft(BorderStyle.MEDIUM, classSessionRegion,
+//                    sheet);
+//
+//            //if not on farthest left column per day,
+//        } else {
 
-            //set left border bolder
-            RegionUtil.setBorderLeft(BorderStyle.MEDIUM, classSessionRegion,
-                    sheet);
-
-            //if not on farthest left column per day,
-        } else {
-
-            //set left border thin
-            RegionUtil.setBorderLeft(BorderStyle.THIN, classSessionRegion,
-                    sheet);
-        }
+        //set left border thin
+        RegionUtil.setBorderLeft(BorderStyle.THIN, classSessionRegion, sheet);
+//        }
 
         //if on border column,
-        if (i == numOfPeople - 1) {
+//        if (i == numOfPeople - 1) {
+//
+//            //set right border bolder
+//            RegionUtil.setBorderRight(BorderStyle.MEDIUM, classSessionRegion,
+//                    sheet);
+//
+//            //if not far right column per day
+//        } else {
 
-            //set right border bolder
-            RegionUtil.setBorderRight(BorderStyle.MEDIUM, classSessionRegion,
-                    sheet);
-
-            //if not far right column per day
-        } else {
-
-            //set right border thin
-            RegionUtil.setBorderRight(BorderStyle.THIN, classSessionRegion,
-                    sheet);
-        }
+        //set right border thin
+        RegionUtil.setBorderRight(BorderStyle.THIN, classSessionRegion, sheet);
+//        }
     }
 
     /**
@@ -1556,7 +1606,7 @@ public final class ExcelMakerConsole {
         Cell startCell = startRow.createCell(1);
 
         Row endRow = sheet.getRow(2);
-        Cell endCell = endRow.createCell(2);
+        Cell endCell = endRow.createCell(1);
 
         //initialize the xml file to be read
         String root = xmlToRead;
@@ -1639,9 +1689,19 @@ public final class ExcelMakerConsole {
                             /*
                              * Write information into desired cell
                              */
-                            startCell.setCellValue(className + "  " + classType
-                                    + "  " + startTime + " - " + endTime + "  "
-                                    + location);
+
+                            //if an alternate event, do not display class type (ALT)
+                            if (classType.equals("ALT")) {
+                                startCell.setCellValue(
+                                        className + "  " + startTime + " - "
+                                                + endTime + "  " + location);
+
+                                //if a class, display class type
+                            } else {
+                                startCell.setCellValue(className + "  "
+                                        + classType + "  " + startTime + " - "
+                                        + endTime + "  " + location);
+                            }
 
                             /*
                              * Add in the merged region of the class
@@ -1678,8 +1738,10 @@ public final class ExcelMakerConsole {
         SimpleReader in = new SimpleReader1L();
         SimpleWriter out = new SimpleWriter1L();
 
+        out.print("Name of xml file: ");
+
         //name of file, also name of root node
-        String root = "test7dayfrequency.xml";
+        String root = in.nextLine();
         SimpleWriter fileOut = new SimpleWriter1L(root);
 
         /*
@@ -1714,7 +1776,7 @@ public final class ExcelMakerConsole {
         int[] classNumList = new int[numOfPeople];
         for (int j = 0; j < numOfPeople; j++) {
             out.println(namesList[j]);
-            out.print("Number of classes currently taking: ");
+            out.print("Number of events currently involved in: ");
             classNumList[j] = in.nextInteger();
 
             out.println("");
@@ -1737,7 +1799,7 @@ public final class ExcelMakerConsole {
              */
             for (int j = 0; j < classNumList[i]; j++) {
                 out.println();
-                out.print("Class " + (j + 1) + ": ");
+                out.print("Event " + (j + 1) + ": ");
 
                 //set temp String equal to the user input class name
                 String className = in.nextLine();
@@ -1757,12 +1819,14 @@ public final class ExcelMakerConsole {
                  * Arrays used to store user info on classes. These will later
                  * be fed into the outputClassInfo function.
                  */
-                String[] start = new String[NUMOFCLASSTYPES];
-                String[] end = new String[NUMOFCLASSTYPES];
-                String[] location = new String[NUMOFCLASSTYPES];
-                String[] occurrenceFrequency = new String[NUMOFCLASSTYPES];
 
-                for (int l = 0; l < NUMOFCLASSTYPES; l++) {
+                //changed from NUMOFCLASSTYPES to CLASSTYPENAMES.length
+                String[] start = new String[CLASSTYPENAMES.length];
+                String[] end = new String[CLASSTYPENAMES.length];
+                String[] location = new String[CLASSTYPENAMES.length];
+                String[] occurrenceFrequency = new String[CLASSTYPENAMES.length];
+
+                for (int l = 0; l < CLASSTYPENAMES.length; l++) {
                     //if the session exists for this class, prompt and record
                     if (classType[l]) {
                         out.println();
@@ -1799,8 +1863,8 @@ public final class ExcelMakerConsole {
         boolean sevenDayWeek = promptWeekFormat(in, out);
         int[] scheduleTimeFrame = promptTimeFrame(in, out);
 
-        createSheetTemplate("actualSchedule.xml", sheetName, use12Hr,
-                sevenDayWeek, scheduleTimeFrame, numOfPeople);
+        createSheetTemplate(root, sheetName, use12Hr, sevenDayWeek,
+                scheduleTimeFrame, numOfPeople);
 
         /*
          * Close input and output streams

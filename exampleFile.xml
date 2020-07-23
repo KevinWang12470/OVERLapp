@@ -1,0 +1,3 @@
+<exampleFile.xml>
+	<student name = "Kevin" numberOfClasses = "1"> 
+		<class className = "Homeschool">
