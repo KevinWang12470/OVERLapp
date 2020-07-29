@@ -71,9 +71,13 @@ public final class ExcelMakerConsole {
      * Array of color indices that will be used to fill the foreground of
      * student class sessions.
      */
-    private static final short[] COLORS = { IndexedColors.LIGHT_BLUE.getIndex(),
+    private static final short[] COLORS = {
             IndexedColors.LIGHT_GREEN.getIndex(),
-            IndexedColors.LAVENDER.getIndex() };
+            IndexedColors.LIGHT_TURQUOISE.getIndex(),
+            IndexedColors.CORNFLOWER_BLUE.getIndex(),
+            IndexedColors.LAVENDER.getIndex(), IndexedColors.ROSE.getIndex(),
+            IndexedColors.CORAL.getIndex(), IndexedColors.TAN.getIndex(),
+            IndexedColors.LEMON_CHIFFON.getIndex() };
 
     /**
      * Constant that holds the number of class types.
@@ -181,13 +185,13 @@ public final class ExcelMakerConsole {
             SimpleWriter out) {
         /*
          * declare classType boolean array. Used to determine existence of LEC
-         * REC or LAB sessions per class
+         * REC or LAB sessions per class. If not a class, then set 4th to true,
+         * rest to false
          */
         boolean[] sessionExists = new boolean[CLASSTYPENAMES.length];
 
         String yesOrNo = "placeHolder";
 
-        //added
         while (!yesOrNo.equals("y") && !yesOrNo.equals("n")) {
             out.print("Is it a class? (y/n):");
             yesOrNo = in.nextLine();
@@ -212,7 +216,6 @@ public final class ExcelMakerConsole {
 
         //if it is a class, check for lecture, lab, or recitation
         if (yesOrNo.equals("y")) {
-            //to here
 
             for (int k = 0; k < NUMOFCLASSTYPES; k++) {
                 //initialize the temporary variable that holds user input
@@ -403,23 +406,29 @@ public final class ExcelMakerConsole {
     private static void outputClassInfo(boolean[] type, String[] start,
             String[] end, String[] location, String[] frequency,
             SimpleWriter out) {
+
+        //if class type lecture
         if (type[0]) {
             out.println("\t\t\t<LEC start = \"" + start[0] + "\" end = \""
                     + end[0] + "\" location = \"" + location[0]
                     + "\" frequency = \"" + frequency[0] + "\" />");
         }
+
+        //if class type recitation
         if (type[1]) {
             out.println("\t\t\t<REC start = \"" + start[1] + "\" end = \""
                     + end[1] + "\" location = \"" + location[1]
                     + "\" frequency = \"" + frequency[1] + "\" />");
         }
+
+        //if class type lab
         if (type[2]) {
             out.println("\t\t\t<LAB start = \"" + start[2] + "\" end = \""
                     + end[2] + "\" location = \"" + location[2]
                     + "\" frequency = \"" + frequency[2] + "\" />");
         }
 
-        //added this if statement
+        //if non-class alternative event
         if (type[3]) {
             out.println("\t\t\t<ALT start = \"" + start[3] + "\" end = \""
                     + end[3] + "\" location = \"" + location[3]
@@ -1272,7 +1281,6 @@ public final class ExcelMakerConsole {
             boolean hr12, int[] scheduleTimeFrame, int numOfStudents)
             throws Exception {
 
-        //TODO: increase frequency from 5days to 7days
         //TODO: Maybe change the colors of the sessions or something
         /*
          * TODO: do not need numOfStudents argument, can derive that from
@@ -1431,11 +1439,6 @@ public final class ExcelMakerConsole {
             RegionUtil.setBorderRight(BorderStyle.MEDIUM, borderLength, sheet);
         }
 
-        //For some reason cell C3 does not fill in its right border
-        //TODO: STILL DOESN'T FILL BORDER
-//        RegionUtil.setBorderRight(BorderStyle.MEDIUM,
-//                new CellRangeAddress(2, 2, 2, 2), sheet);
-
     }
 
     /**
@@ -1457,34 +1460,9 @@ public final class ExcelMakerConsole {
         //add borders
         RegionUtil.setBorderTop(BorderStyle.THIN, classSessionRegion, sheet);
         RegionUtil.setBorderBottom(BorderStyle.THIN, classSessionRegion, sheet);
-
-        //if on farthest left column per day,
-//        if (i == 0) {
-//
-//            //set left border bolder
-//            RegionUtil.setBorderLeft(BorderStyle.MEDIUM, classSessionRegion,
-//                    sheet);
-//
-//            //if not on farthest left column per day,
-//        } else {
-
-        //set left border thin
         RegionUtil.setBorderLeft(BorderStyle.THIN, classSessionRegion, sheet);
-//        }
-
-        //if on border column,
-//        if (i == numOfPeople - 1) {
-//
-//            //set right border bolder
-//            RegionUtil.setBorderRight(BorderStyle.MEDIUM, classSessionRegion,
-//                    sheet);
-//
-//            //if not far right column per day
-//        } else {
-
-        //set right border thin
         RegionUtil.setBorderRight(BorderStyle.THIN, classSessionRegion, sheet);
-//        }
+
     }
 
     /**
@@ -1518,11 +1496,18 @@ public final class ExcelMakerConsole {
     }
 
     /**
+     * Add the bottom portion of the schedule, including the borders, and a
+     * legend denoting which person is associated with which color.
      *
      * @param xmlToRead
+     *            the String of the name of the xml file containing user info
      * @param sheet
+     *            the specific sheet of the excel file being written to
      * @param sevenDays
+     *            whether the schedule is using a 7 day format (true) or a 5 day
+     *            format (false)
      * @param sessionColorStyles
+     *            the colors that will be used for each person
      */
     private static void addScheduleBottom(String xmlToRead, Sheet sheet,
             boolean sevenDays, CellStyle[] sessionColorStyles) {
@@ -1820,7 +1805,6 @@ public final class ExcelMakerConsole {
                  * be fed into the outputClassInfo function.
                  */
 
-                //changed from NUMOFCLASSTYPES to CLASSTYPENAMES.length
                 String[] start = new String[CLASSTYPENAMES.length];
                 String[] end = new String[CLASSTYPENAMES.length];
                 String[] location = new String[CLASSTYPENAMES.length];

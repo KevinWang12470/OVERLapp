@@ -1,0 +1,38 @@
+<moreThan4.xml>
+	<student name = "p1" numberOfClasses = "1"> 
+		<class className = "p1">
+			<ALT start = "12:00PM" end = "1:00PM" location = "p1" frequency = "1100101" />
+		</class>
+	</student>
+	<student name = "p2" numberOfClasses = "1"> 
+		<class className = "p2">
+			<ALT start = "12:00PM" end = "1:00PM" location = "p2" frequency = "1010101" />
+		</class>
+	</student>
+	<student name = "p3" numberOfClasses = "1"> 
+		<class className = "p3">
+			<ALT start = "12:00PM" end = "1:00PM" location = "p3" frequency = "1010111" />
+		</class>
+	</student>
+	<student name = "p4" numberOfClasses = "1"> 
+		<class className = "p4">
+			<ALT start = "12:00PM" end = "1:00PM" location = "p4" frequency = "1110110" />
+		</class>
+	</student>
+	<student name = "p5" numberOfClasses = "1"> 
+		<class className = "p5">
+			<ALT start = "12:00PM" end = "1:00PM" location = "p5" frequency = "1011000" />
+		</class>
+	</student>
+	<student name = "p6" numberOfClasses = "1"> 
+		<class className = "p6">
+			<ALT start = "12:00PM" end = "1:00PM" location = "p6" frequency = "1100110" />
+		</class>
+	</student>
+	<student name="p7" numberOfClasses="1">
+		<class className="p7">
+			<ALT start="12:00PM" end="1:00PM" location="p7" frequency="1100101"></ALT></class></student>
+	<student name="p8" numberOfClasses="1">
+		<class className="p8">
+			<ALT start="12:00PM" end="1:00PM" location="p8" frequency="1011010"></ALT></class></student>
+</moreThan4.xml>
