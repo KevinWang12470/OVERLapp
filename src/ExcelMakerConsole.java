@@ -1276,10 +1276,8 @@ public final class ExcelMakerConsole {
      *
      */
     public static void createSheetTemplate(String xmlToRead, String fileName,
-            boolean satSun,
-
-            boolean hr12, int[] scheduleTimeFrame, int numOfStudents)
-            throws Exception {
+            boolean satSun, boolean hr12, int[] scheduleTimeFrame,
+            int numOfStudents) throws Exception {
 
         //TODO: Maybe change the colors of the sessions or something
         /*
@@ -1847,13 +1845,13 @@ public final class ExcelMakerConsole {
         boolean sevenDayWeek = promptWeekFormat(in, out);
         int[] scheduleTimeFrame = promptTimeFrame(in, out);
 
-        createSheetTemplate(root, sheetName, use12Hr, sevenDayWeek,
+        createSheetTemplate(root, sheetName, sevenDayWeek, use12Hr,
                 scheduleTimeFrame, numOfPeople);
 
         /*
          * Close input and output streams
          */
-        fileOut.close();
+        //fileOut.close();
         printDone();
 
         in.close();
