@@ -115,7 +115,7 @@ public final class OvLController1 implements OvLController {
             int tabNum = this.model.returnNumOfPeople();
 
             //check if the integer is in range
-            inRange = tabNum <= MAXNUM && tabNum >= 1;
+            inRange = tabNum <= MAXNUM && tabNum >= 0;
 
             JOptionPane.showMessageDialog(new JFrame(), "Input is: " + tabNum);
 

@@ -13,6 +13,7 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextArea;
+import javax.swing.JTextField;
 
 /**
  * GUI for OverLAPP.
@@ -51,7 +52,7 @@ public final class OvLView1 extends JFrame implements OvLView {
     /**
      * The Text field that contains how many people are involved.
      */
-    private ArrayList<JTextArea> names;
+    private ArrayList<JTextField> names;
 //    private final JSpinner numOfPeople;
 
     /**
@@ -157,7 +158,7 @@ public final class OvLView1 extends JFrame implements OvLView {
         this.userInfoPanels = new ArrayList<JPanel>();
 
         //Declare the JTextAreas to be used in userInfoPanels
-        this.names = new ArrayList<JTextArea>();
+        this.names = new ArrayList<JTextField>();
 
         JButton testButton = new JButton("userInfoPane goes here");
 
@@ -351,14 +352,21 @@ public final class OvLView1 extends JFrame implements OvLView {
 
 //        if(userInfoPanels)
 
-        //initialize preliminary text box for test
-        this.names.add(new JTextArea());
-
         for (int i = 0; i < numOfP; i++) {
+
+            /*
+             * Create blank elements in JPanel arraylist that will go into each
+             * JTabbedPane
+             */
             this.userInfoPanels.add(new JPanel());
 
-            //TODO: MESSED UP HERE
-            //add preliminary text box for test
+            /*
+             * Create blank fields in JTextField arraylist that will be the name
+             * input field
+             */
+            this.names.add(new JTextField(15));
+
+            //add name text fields into JPanels
             this.userInfoPanels.get(i).add(this.names.get(i));
 
             //put JPanel into designated tabbed pane slot
