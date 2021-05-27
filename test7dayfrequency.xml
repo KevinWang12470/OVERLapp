@@ -1,8 +1,0 @@
-<test7dayfrequency.xml>
-	<student name = "Kevin" numberOfClasses = "1"> 
-		<class className = "Excel Maker">
-			<REC start = "1:00PM" end = "2:00PM" location = "Home" frequency = "1001010" />
-			<LAB start = "1:00PM" end = "4:00PM" location = "Home" frequency = "0110101" />
-		</class>
-	</student>
-</test7dayfrequency.xml>
