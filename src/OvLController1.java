@@ -115,9 +115,9 @@ public final class OvLController1 implements OvLController {
             int tabNum = this.model.returnNumOfPeople();
 
             //check if the integer is in range
-            inRange = tabNum <= MAXNUM && tabNum >= 0;
+            inRange = tabNum <= MAXNUM && tabNum >= 1;
 
-            JOptionPane.showMessageDialog(new JFrame(), "Input is: " + tabNum);
+            //JOptionPane.showMessageDialog(new JFrame(), "Input is: " + tabNum);
 
             //if the user input is within the designated range of people
             if (inRange) {
@@ -153,6 +153,11 @@ public final class OvLController1 implements OvLController {
             this.view.setPageInvisible(currentPageIndex);
             this.view.setPageVisible(currentPageIndex - 1);
         }
+    }
+
+    @Override
+    public void processBUpdate() {
+
     }
 
 }

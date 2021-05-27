@@ -16,4 +16,9 @@ public interface OvLController {
      */
     void processBBack();
 
+    /**
+     * Update user info pane with inputted number of event text fields.
+     */
+    void processBUpdate();
+
 }

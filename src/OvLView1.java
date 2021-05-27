@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextArea;
@@ -47,12 +48,18 @@ public final class OvLView1 extends JFrame implements OvLView {
      * JPanel Array list whose size is the same as the population. The panels,
      * which contain inputed user info, go into each tabbed pane.
      */
-    private ArrayList<JPanel> userInfoPanels;
+    private ArrayList<JPanel> userInfoPanels, userEventPanels;
+
+    /**
+     * Update buttons for each person involved.
+     */
+    private final ArrayList<JButton> bUpdate;
 
     /**
      * The Text field that contains how many people are involved.
      */
     private ArrayList<JTextField> names;
+    private ArrayList<JTextField> eventNum;
 //    private final JSpinner numOfPeople;
 
     /**
@@ -156,9 +163,14 @@ public final class OvLView1 extends JFrame implements OvLView {
 
         //Declare the JPanels used in the tabbed pane
         this.userInfoPanels = new ArrayList<JPanel>();
+        this.userEventPanels = new ArrayList<JPanel>();
 
         //Declare the JTextAreas to be used in userInfoPanels
         this.names = new ArrayList<JTextField>();
+        this.eventNum = new ArrayList<JTextField>();
+
+        //Declare the update button for each JTabbedPane
+        this.bUpdate = new ArrayList<JButton>();
 
         JButton testButton = new JButton("userInfoPane goes here");
 
@@ -338,6 +350,8 @@ public final class OvLView1 extends JFrame implements OvLView {
             this.page[2].setVisible(true);
         } else if (source == this.bpBack[0] || source == this.bpBack[1]) {
             this.controller.processBBack();
+        } else {
+            this.controller.processBUpdate();
         }
 
         /*
@@ -352,6 +366,18 @@ public final class OvLView1 extends JFrame implements OvLView {
 
 //        if(userInfoPanels)
 
+        /*
+         * TODO: Add memory of already filled in tabs instead of clearing all
+         * panels
+         */
+        //Clear arrays if necessary
+        this.userInfoPanels.clear();
+        this.userEventPanels.clear();
+        this.names.clear();
+        this.eventNum.clear();
+
+        this.userInfoPane.removeAll();
+
         for (int i = 0; i < numOfP; i++) {
 
             /*
@@ -359,15 +385,22 @@ public final class OvLView1 extends JFrame implements OvLView {
              * JTabbedPane
              */
             this.userInfoPanels.add(new JPanel());
+            this.userEventPanels.add(new JPanel());
 
             /*
              * Create blank fields in JTextField arraylist that will be the name
              * input field
              */
             this.names.add(new JTextField(15));
+            this.eventNum.add(new JTextField(15));
+            this.bUpdate.add(new JButton("Update"));
 
             //add name text fields into JPanels
+            this.userInfoPanels.get(i).add(new JLabel("Name"));
             this.userInfoPanels.get(i).add(this.names.get(i));
+            this.userInfoPanels.get(i).add(new JLabel("Number of Events"));
+            this.userInfoPanels.get(i).add(this.eventNum.get(i));
+            this.userInfoPanels.get(i).add(this.bUpdate.get(i));
 
             //put JPanel into designated tabbed pane slot
             this.userInfoPane.addTab("Person " + (i + 1),
