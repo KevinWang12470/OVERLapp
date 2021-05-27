@@ -1,0 +1,15 @@
+<altEventTest.xml>
+	<student name = "Kevin" numberOfClasses = "2"> 
+		<class className = "CSE 2221">
+			<LAB start = "2:00PM" end = "5:00PM" location = "Home" frequency = "1010100" />
+		</class>
+		<class className = "Work">
+			<ALT start = "3:00PM" end = "6:00PM" location = "Knowlton" frequency = "0101011" />
+		</class>
+	</student>
+	<student name = "Catherine" numberOfClasses = "1"> 
+		<class className = "Chip Manager">
+			<ALT start = "10:00AM" end = "7:00PM" location = "Frito Lay Factory" frequency = "1111100" />
+		</class>
+	</student>
+</altEventTest.xml>

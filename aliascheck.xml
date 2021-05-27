@@ -1,0 +1,14 @@
+<xmlSchedule>
+<student name = "Kevin" numberOfClasses = "2"> 
+<class className = "class 1">
+<LEC start = "123" end = "234" location = "asdf"/>
+<REC start = "345" end = "456" location = "sdfg"/>
+<LAB start = "567" end = "678" location = "dfgh"/>
+</class>
+<class className = "class 2">
+<LEC start = "098" end = "987" location = ";lkj"/>
+<REC start = "876" end = "765" location = "lkjh"/>
+<LAB start = "654" end = "543" location = "kjhg"/>
+</class>
+</student>
+</xmlSchedule>

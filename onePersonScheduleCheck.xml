@@ -1,0 +1,7 @@
+<onePersonScheduleCheck.xml>
+	<student name = "Kevin" numberOfClasses = "1"> 
+		<class className = "Work">
+			<ALT start = "10:00AM" end = "2:00PM" location = "Home" frequency = "1111100" />
+		</class>
+	</student>
+</onePersonScheduleCheck.xml>
