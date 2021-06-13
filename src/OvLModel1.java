@@ -10,6 +10,11 @@ import org.apache.poi.ss.usermodel.IndexedColors;
 public final class OvLModel1 implements OvLModel {
 
     /**
+     * The list of people involved in the schedule.
+     */
+    private ArrayList<Being> users;
+
+    /**
      * Array of the name of class types. CHANGES MADE, added "Alternative" to
      * CLASSTYPENAMES, added scenario to output class, changed check session
      * existence to include alt event.
@@ -118,12 +123,21 @@ public final class OvLModel1 implements OvLModel {
      */
     public OvLModel1() {
         this.population = 1;
+        this.users = new ArrayList<Being>(1);
     }
 
     @Override
     public void setNumOfPeople(int num) {
 
         this.population = num;
+
+        //if set number is greater than arraylist size, increase arraylist size
+        if (this.users.size() < this.population) {
+            for (int i = 0; i < this.population - this.users.size(); i++) {
+                this.users.add(new Being());
+            }
+        }
+
     }
 
     @Override

@@ -30,7 +30,7 @@ public class Being {
      * Constructor.
      */
     public Being() {
-        this.name = "myName";
+        this.name = "";
         this.eventNum = 0;
         this.eventList = new ArrayList<Event>();
     }
@@ -71,6 +71,133 @@ public class Being {
      */
     public int getEventNum() {
         return this.eventNum;
+    }
+
+    /**
+     * Sets the start time of the event.
+     *
+     * @param index
+     *            index of event in eventList
+     *
+     * @param time
+     *            The time in 24hr and no colon
+     */
+    public void setEventStartTime(int index, int time) {
+        this.eventList.get(index).setStartTime(time);
+    }
+
+    /**
+     * Gets the start time of the event.
+     *
+     * @param index
+     *            index of the event in the eventList
+     *
+     * @return The start time in 24hr and no colon
+     */
+    public int getEventStartTime(int index) {
+        return this.eventList.get(index).getStartTime();
+    }
+
+    /**
+     * Sets the start time of the event.
+     *
+     * @param index
+     *            index of the event in the eventList
+     *
+     * @param time
+     *            The time in 24hr and no colon
+     */
+    public void setEventEndTime(int index, int time) {
+        this.eventList.get(index).setEndTime(time);
+    }
+
+    /**
+     * Gets the end time of the event.
+     *
+     * @param index
+     *            index of the event in the eventList
+     *
+     * @return The end time in 24hr and no colon
+     */
+    public int getEventEndTime(int index) {
+        return this.eventList.get(index).getEndTime();
+    }
+
+    /**
+     * Sets the occurrences of the event.
+     *
+     * @param index
+     *            index of the event in the eventList
+     *
+     * @param weekInput
+     *            7 digit number corresponding to each day of the week. 1 if
+     *            occurs, 0 if does not occur.
+     */
+    public void setOccurrences(int index, int weekInput) {
+        this.eventList.get(index).setOccurrences(weekInput);
+    }
+
+    /**
+     * Gets the occurrences of the event.
+     *
+     * @param index
+     *            index of the event in the eventList
+     *
+     * @return 7 digit number corresponding to each day of the week. 1 if
+     *         occurs, 0 if does not occur.
+     */
+    public int getOccurrences(int index) {
+        return this.eventList.get(index).getOccurrences();
+    }
+
+    /**
+     * Sets the name of the event.
+     *
+     * @param index
+     *            index of the event in the eventList
+     *
+     * @param eventName
+     *            Name of the Event
+     */
+    public void setName(int index, String eventName) {
+        this.eventList.get(index).setName(eventName);
+    }
+
+    /**
+     * Gets the name of the event.
+     *
+     * @param index
+     *            index of the event in the eventList
+     *
+     * @return the name of the event
+     */
+    public String getName(int index) {
+        return this.eventList.get(index).getName();
+    }
+
+    /**
+     * Sets the location of the event.
+     *
+     * @param index
+     *            index of the event in the eventList
+     *
+     * @param eventLocation
+     *            Location of the Event
+     */
+    public void setLocation(int index, String eventLocation) {
+        this.eventList.get(index).setLocation(eventLocation);
+    }
+
+    /**
+     * Gets the location of the event.
+     *
+     * @param index
+     *            index of the event in the eventList
+     *
+     * @return the location of the Event
+     */
+    public String getLocation(int index) {
+        return this.eventList.get(index).getLocation();
     }
 
 }

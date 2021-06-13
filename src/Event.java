@@ -86,4 +86,42 @@ public class Event {
     public int getOccurrences() {
         return this.occurrences;
     }
+
+    /**
+     * Sets the name of the event.
+     *
+     * @param eventName
+     *            Name of the Event
+     */
+    public void setName(String eventName) {
+        this.name = eventName;
+    }
+
+    /**
+     * Gets the name of the event.
+     *
+     * @return the name of the event
+     */
+    public String getName() {
+        return this.name;
+    }
+
+    /**
+     * Sets the location of the event.
+     *
+     * @param eventLocation
+     *            Location of the Event
+     */
+    public void setLocation(String eventLocation) {
+        this.location = eventLocation;
+    }
+
+    /**
+     * Gets the location of the event.
+     *
+     * @return the location of the Event
+     */
+    public String getLocation() {
+        return this.location;
+    }
 }
