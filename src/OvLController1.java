@@ -77,7 +77,6 @@ public final class OvLController1 implements OvLController {
     @Override
     public void processBp1() {
         boolean inRange = true;
-        boolean isInt = true;
 
 //        try {
 //            this.numOfPeople.commitEdit();
@@ -90,18 +89,8 @@ public final class OvLController1 implements OvLController {
         //set result to string
         String tempString = this.view.populationToString();
 
-        //Check if input is an integer
-        try {
-            Integer.parseInt(tempString);
-        } catch (NumberFormatException e) {
-            isInt = false;
-            //notify user
-            JOptionPane.showMessageDialog(new JFrame(),
-                    "Input is not a valid number");
-        }
-
         //if input is an integer, continue
-        if (isInt) {
+        if (this.isInteger(tempString)) {
 
             //get the integer
             /*
@@ -139,8 +128,13 @@ public final class OvLController1 implements OvLController {
                         "Input is an invalid number. "
                                 + "Try an integer between 1 and 8 inclusive");
             }
+        } else {
+            //notify user
+            JOptionPane.showMessageDialog(new JFrame(),
+                    "Input is not a valid number");
         }
         this.view.updateUserNames(this.model.getNames());
+        this.view.updateUserEventNum(this.model.getEventNum());
     }
 
     @Override
@@ -160,12 +154,57 @@ public final class OvLController1 implements OvLController {
     public void processBUpdate() {
         String[] nameList = this.view.recordUserNames();
         this.model.setNames(nameList);
+        System.out.println("Names updated.");
+
+        String[] eventNumList = this.view.recordUserEventNum();
+        if (this.isInteger(eventNumList)) {
+            this.model.setEventNum(this.convertToInt(eventNumList));
+            System.out.println("Event numbers updated");
+        } else {
+            System.out.println(
+                    "Error: Invalid int detected when recording event num");
+            JOptionPane.showMessageDialog(new JFrame(),
+                    "Error: Invalid number detected when recording number of events\n"
+                            + "**Number of events not recorded**");
+        }
+
         System.out.println("it updated.");
+        System.out.println("");
     }
 
     @Override
     public void recordToModel() {
 
+    }
+
+    @Override
+    public boolean isInteger(String s) {
+        //Check if input is an integer
+        boolean isInt = true;
+        try {
+            Integer.parseInt(s);
+        } catch (NumberFormatException e) {
+            isInt = false;
+        }
+        return isInt;
+    }
+
+    @Override
+    public boolean isInteger(String[] sArray) {
+        boolean isInt = true;
+        for (int i = 0; i < sArray.length; i++) {
+            isInt = this.isInteger(sArray[i]);
+        }
+        return isInt;
+    }
+
+    @Override
+    public int[] convertToInt(String[] sArray) {
+        int[] intArray = new int[sArray.length];
+        for (int i = 0; i < sArray.length; i++) {
+            intArray[i] = Integer.parseInt(sArray[i]);
+        }
+        return intArray;
     }
 
 }

@@ -176,4 +176,27 @@ public final class OvLModel1 implements OvLModel {
         }
     }
 
+    @Override
+    public int getEventNum(int index) {
+        return this.users.get(index).getEventNum();
+    }
+
+    @Override
+    public int[] getEventNum() {
+        int[] eventNumList = new int[this.population];
+
+        for (int i = 0; i < this.population; i++) {
+            eventNumList[i] = this.getEventNum(i);
+        }
+
+        return eventNumList;
+    }
+
+    @Override
+    public void setEventNum(int[] eventNumList) {
+        for (int i = 0; i < this.population; i++) {
+            this.users.get(i).setEventNum(eventNumList[i]);
+        }
+    }
+
 }

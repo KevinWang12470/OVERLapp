@@ -86,6 +86,7 @@ public interface OvLView extends ActionListener {
 
     /**
      * Updates the names in the text fields in the tabbed panes in the 2nd page.
+     * (used after text field data is cleared)
      *
      * @param nameList
      *            list of names of the users.
@@ -99,4 +100,21 @@ public interface OvLView extends ActionListener {
      * @return a string array of the names of the users
      */
     String[] recordUserNames();
+
+    /**
+     * Updates the number of events being participated in in the text fields in
+     * the tabbed panes on page 2. (used after text field data is cleared)
+     *
+     * @param eventNumList
+     *            list of the number of events that users are participating in
+     */
+    void updateUserEventNum(int[] eventNumList);
+
+    /**
+     * Records the numbers in the JTextFields responsible for the number of
+     * events participated in.
+     *
+     * @return an int array of the number of events being participated in.
+     */
+    String[] recordUserEventNum();
 }

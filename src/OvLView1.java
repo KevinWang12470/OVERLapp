@@ -59,6 +59,10 @@ public final class OvLView1 extends JFrame implements OvLView {
      * The Text field that contains how many people are involved.
      */
     private ArrayList<JTextField> names;
+
+    /**
+     * The text field that contains how many events each person is doing.
+     */
     private ArrayList<JTextField> eventNum;
 //    private final JSpinner numOfPeople;
 
@@ -449,6 +453,25 @@ public final class OvLView1 extends JFrame implements OvLView {
         for (int i = 0; i < nameList.length; i++) {
             this.names.get(i).setText(nameList[i]);
         }
+    }
+
+    @Override
+    public void updateUserEventNum(int[] eventNumList) {
+        for (int i = 0; i < eventNumList.length; i++) {
+            this.eventNum.get(i).setText(Integer.toString(eventNumList[i]));
+        }
+    }
+
+    @Override
+    public String[] recordUserEventNum() {
+
+        String[] eventNumList = new String[this.userInfoPanels.size()];
+
+        for (int i = 0; i < this.userInfoPanels.size(); i++) {
+            eventNumList[i] = this.eventNum.get(i).getText();
+        }
+
+        return eventNumList;
     }
 
     @Override

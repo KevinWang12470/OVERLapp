@@ -55,17 +55,22 @@ public class Being {
     }
 
     /**
-     * Set the name of the being.
+     * Set the number of events the Being is doing a week.
      *
      * @param input
      *            User inputted name.
      */
     public void setEventNum(int input) {
         this.eventNum = input;
+
+        while (this.eventNum > this.eventList.size()) {
+            this.eventList.add(new Event());
+        }
+
     }
 
     /**
-     * Output the name of the being.
+     * Output the number of events the Being is doing a week.
      *
      * @return the name of the being.
      */

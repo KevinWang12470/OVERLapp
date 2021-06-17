@@ -35,4 +35,31 @@ public interface OvLModel {
      *            The list of names to be recorded
      */
     void setNames(String[] nameList);
+
+    /**
+     * Returns the number of events each person is participating in, in the form
+     * of an int array.
+     *
+     * @return an int array containing the number of events being participated
+     *         in for each Being
+     */
+    int[] getEventNum();
+
+    /**
+     * Returns the number of events a single person is participating in.
+     *
+     * @param index
+     *            the position in line that the Being is in the namesList
+     * @return an int representing the number of events participated in.
+     */
+    int getEventNum(int index);
+
+    /**
+     * Records the user inputted number of events into the model.
+     *
+     * @param eventNumList
+     *            The number of events the users are participating in
+     */
+    void setEventNum(int[] eventNumList);
+
 }
