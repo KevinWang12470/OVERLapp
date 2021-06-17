@@ -123,20 +123,27 @@ public final class OvLModel1 implements OvLModel {
      */
     public OvLModel1() {
         this.population = 1;
-        this.users = new ArrayList<Being>(1);
+        this.users = new ArrayList<Being>();
+
     }
 
     @Override
     public void setNumOfPeople(int num) {
 
         this.population = num;
+        System.out.println("population num: " + this.population);
+        System.out.println("current user size: " + this.users.size());
+        System.out.println("");
 
         //if set number is greater than arraylist size, increase arraylist size
         if (this.users.size() < this.population) {
-            for (int i = 0; i < this.population - this.users.size(); i++) {
+            int difference = this.population - this.users.size();
+            for (int i = 0; i < difference; i++) {
                 this.users.add(new Being());
             }
         }
+        System.out.println("current user size: " + this.users.size());
+        System.out.println("");
 
     }
 
@@ -145,6 +152,28 @@ public final class OvLModel1 implements OvLModel {
 
         return this.population;
 
+    }
+
+    @Override
+    public String[] getNames() {
+        String[] nameList = new String[this.population];
+
+        System.out.println("namelist size: " + nameList.length);
+        System.out.println("users size: " + this.users.size());
+
+        //TODO: Something wrong here. users is 1 less than we need, when changing numbers by more than 1
+        for (int i = 0; i < this.population; i++) {
+            nameList[i] = this.users.get(i).getName();
+        }
+
+        return nameList;
+    }
+
+    @Override
+    public void setNames(String[] nameList) {
+        for (int i = 0; i < nameList.length; i++) {
+            this.users.get(i).setName(nameList[i]);
+        }
     }
 
 }

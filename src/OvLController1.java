@@ -140,6 +140,7 @@ public final class OvLController1 implements OvLController {
                                 + "Try an integer between 1 and 8 inclusive");
             }
         }
+        this.view.updateUserNames(this.model.getNames());
     }
 
     @Override
@@ -157,6 +158,13 @@ public final class OvLController1 implements OvLController {
 
     @Override
     public void processBUpdate() {
+        String[] nameList = this.view.recordUserNames();
+        this.model.setNames(nameList);
+        System.out.println("it updated.");
+    }
+
+    @Override
+    public void recordToModel() {
 
     }
 

@@ -78,4 +78,25 @@ public interface OvLView extends ActionListener {
      *            int that describes which page to set invisible
      */
     void setPageInvisible(int index);
+
+    /**
+     * Updates the tabbed panes in the 2nd page.
+     */
+    void updateTPaneValues();
+
+    /**
+     * Updates the names in the text fields in the tabbed panes in the 2nd page.
+     *
+     * @param nameList
+     *            list of names of the users.
+     */
+    void updateUserNames(String[] nameList);
+
+    /**
+     * Records the text in the JTextFields responsible for the names of the
+     * users.
+     *
+     * @return a string array of the names of the users
+     */
+    String[] recordUserNames();
 }

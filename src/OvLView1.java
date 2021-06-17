@@ -53,7 +53,7 @@ public final class OvLView1 extends JFrame implements OvLView {
     /**
      * Update buttons for each person involved.
      */
-    private final ArrayList<JButton> bUpdate;
+    private final JButton bUpdate;
 
     /**
      * The Text field that contains how many people are involved.
@@ -169,9 +169,6 @@ public final class OvLView1 extends JFrame implements OvLView {
         this.names = new ArrayList<JTextField>();
         this.eventNum = new ArrayList<JTextField>();
 
-        //Declare the update button for each JTabbedPane
-        this.bUpdate = new ArrayList<JButton>();
-
         JButton testButton = new JButton("userInfoPane goes here");
 
         //specify constraints placed on the user info pane
@@ -180,7 +177,7 @@ public final class OvLView1 extends JFrame implements OvLView {
         c.ipadx = 500; //Large horizontal length
         c.weightx = 1.0; //take all available horizontal space
         c.weighty = 1.0; //take all available vertical space
-        c.gridwidth = 3; //span 3 columns
+        c.gridwidth = 5; //span 3 columns
         c.gridheight = 1; //span 1 row
         c.gridx = 0; //start in far left column
         c.gridy = 0; //start in far top row
@@ -194,31 +191,53 @@ public final class OvLView1 extends JFrame implements OvLView {
         c.ipady = 0; //reset the vertical size
         c.ipadx = 0;
 
-        c.weightx = 0.1; //small increase in horizontal size
+        c.weightx = 0.2; //small increase in horizontal size
         c.weighty = 0.0; //get no extra vertical space
         c.gridwidth = 1; //width of one
         c.anchor = GridBagConstraints.LAST_LINE_END; //anchored to lower left
         c.insets = new Insets(30, 0, 30, 10); //top padding
-        c.gridx = 2;
+        c.gridx = 4;
         c.gridy = 2;
 
         this.page[1].add(this.bp2p3, c);
 
-//        JPanel buffer1 = new JPanel();
+        //Initialize the Back Button
         c.fill = GridBagConstraints.HORIZONTAL;
         c.insets = new Insets(30, 0, 30, 10);
         c.gridwidth = 1;
-        c.weightx = 0.1; //for consistent column width change
+        c.weightx = 0.2; //for consistent column width change
         c.anchor = GridBagConstraints.LAST_LINE_START; //anchored to lower left
         c.gridx = 0;
         c.gridy = 2;
         this.page[1].add(this.bpBack[0], c);
 
+        //Declare the update button
+        this.bUpdate = new JButton("Update");
+        this.bUpdate.addActionListener(this);
+
+        c.fill = GridBagConstraints.HORIZONTAL;
+        //c.insets = new Insets(0, 0, 0, 0); //reset padding
+        c.insets = new Insets(30, 0, 30, 10);
+        c.weightx = 0.2; //for consistent column width change
+        c.gridx = 2;
+        c.gridy = 2;
+        this.page[1].add(this.bUpdate, c);
+
+        //Initializing buffers between buttons on bottom (back, update, save)
+
+        JPanel buffer1 = new JPanel();
+        c.fill = GridBagConstraints.HORIZONTAL;
+        c.insets = new Insets(0, 0, 0, 0); //reset padding
+        c.weightx = 0.3; //for consistent column width change
+        c.gridx = 1;
+        c.gridy = 2;
+        this.page[1].add(buffer1, c);
+
         JPanel buffer2 = new JPanel();
         c.fill = GridBagConstraints.HORIZONTAL;
         c.insets = new Insets(0, 0, 0, 0); //reset padding
-        c.weightx = 0.5; //for consistent column width change
-        c.gridx = 1;
+        c.weightx = 0.4; //for consistent column width change
+        c.gridx = 3;
         c.gridy = 2;
         this.page[1].add(buffer2, c);
 
@@ -350,7 +369,7 @@ public final class OvLView1 extends JFrame implements OvLView {
             this.page[2].setVisible(true);
         } else if (source == this.bpBack[0] || source == this.bpBack[1]) {
             this.controller.processBBack();
-        } else {
+        } else if (source == this.bUpdate) {
             this.controller.processBUpdate();
         }
 
@@ -359,6 +378,7 @@ public final class OvLView1 extends JFrame implements OvLView {
          * of the method body)
          */
         this.setCursor(Cursor.getDefaultCursor());
+
     }
 
     @Override
@@ -393,20 +413,42 @@ public final class OvLView1 extends JFrame implements OvLView {
              */
             this.names.add(new JTextField(15));
             this.eventNum.add(new JTextField(15));
-            this.bUpdate.add(new JButton("Update"));
+            //this.bUpdate.add(new JButton("Update"));
 
             //add name text fields into JPanels
             this.userInfoPanels.get(i).add(new JLabel("Name"));
             this.userInfoPanels.get(i).add(this.names.get(i));
             this.userInfoPanels.get(i).add(new JLabel("Number of Events"));
             this.userInfoPanels.get(i).add(this.eventNum.get(i));
-            this.userInfoPanels.get(i).add(this.bUpdate.get(i));
+            //this.userInfoPanels.get(i).add(this.bUpdate.get(i));
 
             //put JPanel into designated tabbed pane slot
             this.userInfoPane.addTab("Person " + (i + 1),
                     this.userInfoPanels.get(i));
         }
 
+    }
+
+    @Override
+    public void updateTPaneValues() {
+
+    }
+
+    @Override
+    public String[] recordUserNames() {
+        String[] nameList = new String[this.userInfoPanels.size()];
+
+        for (int i = 0; i < this.userInfoPanels.size(); i++) {
+            nameList[i] = this.names.get(i).getText();
+        }
+        return nameList;
+    }
+
+    @Override
+    public void updateUserNames(String[] nameList) {
+        for (int i = 0; i < nameList.length; i++) {
+            this.names.get(i).setText(nameList[i]);
+        }
     }
 
     @Override

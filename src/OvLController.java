@@ -21,4 +21,9 @@ public interface OvLController {
      */
     void processBUpdate();
 
+    /**
+     * Records user inputted information to the model.
+     */
+    void recordToModel();
+
 }

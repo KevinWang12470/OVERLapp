@@ -20,4 +20,19 @@ public interface OvLModel {
      * @return the number of people in the schedule, of type int.
      */
     int returnNumOfPeople();
+
+    /**
+     * Returns the list of users' names as a String Array.
+     *
+     * @return the array of names of people involved
+     */
+    String[] getNames();
+
+    /**
+     * Records the user inputted names into the model.
+     *
+     * @param nameList
+     *            The list of names to be recorded
+     */
+    void setNames(String[] nameList);
 }

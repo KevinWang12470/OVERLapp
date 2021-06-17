@@ -133,7 +133,7 @@ public class Being {
      *            7 digit number corresponding to each day of the week. 1 if
      *            occurs, 0 if does not occur.
      */
-    public void setOccurrences(int index, int weekInput) {
+    public void setEventOccurrences(int index, int weekInput) {
         this.eventList.get(index).setOccurrences(weekInput);
     }
 
@@ -146,7 +146,7 @@ public class Being {
      * @return 7 digit number corresponding to each day of the week. 1 if
      *         occurs, 0 if does not occur.
      */
-    public int getOccurrences(int index) {
+    public int getEventOccurrences(int index) {
         return this.eventList.get(index).getOccurrences();
     }
 
@@ -159,7 +159,7 @@ public class Being {
      * @param eventName
      *            Name of the Event
      */
-    public void setName(int index, String eventName) {
+    public void setEventName(int index, String eventName) {
         this.eventList.get(index).setName(eventName);
     }
 
@@ -171,7 +171,7 @@ public class Being {
      *
      * @return the name of the event
      */
-    public String getName(int index) {
+    public String getEventName(int index) {
         return this.eventList.get(index).getName();
     }
 
@@ -184,7 +184,7 @@ public class Being {
      * @param eventLocation
      *            Location of the Event
      */
-    public void setLocation(int index, String eventLocation) {
+    public void setEventLocation(int index, String eventLocation) {
         this.eventList.get(index).setLocation(eventLocation);
     }
 
@@ -196,7 +196,7 @@ public class Being {
      *
      * @return the location of the Event
      */
-    public String getLocation(int index) {
+    public String getEventLocation(int index) {
         return this.eventList.get(index).getLocation();
     }
 
