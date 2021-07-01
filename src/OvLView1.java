@@ -64,7 +64,43 @@ public final class OvLView1 extends JFrame implements OvLView {
      * The text field that contains how many events each person is doing.
      */
     private ArrayList<JTextField> eventNum;
-//    private final JSpinner numOfPeople;
+
+    /**
+     * The Panels for each event. Separated as a list of lists of panels.
+     * Imagine a table where the rows are the people and columns are the events
+     * they are in.
+     */
+    private ArrayList<ArrayList<JPanel>> eventPanels;
+
+    /**
+     * Name JTextFields for each event.
+     */
+    private ArrayList<ArrayList<JTextField>> eventNames;
+
+    /**
+     * Event Type ComboBoxes for each event.
+     */
+    private ArrayList<ArrayList<JComboBox>> eventType;
+
+    /**
+     * Event Start Hour comboBoxes for each event.
+     */
+    private ArrayList<ArrayList<JComboBox>> eventStartHr;
+
+    /**
+     * Event Start Minute comboBoxes for each event.
+     */
+    private ArrayList<ArrayList<JComboBox>> eventStartMin;
+
+    /**
+     * Event End Hour comboBoxes for each event.
+     */
+    private ArrayList<ArrayList<JComboBox>> eventEndHr;
+
+    /**
+     * Event End Minute comboBoxes for each event.
+     */
+    private ArrayList<ArrayList<JComboBox>> eventEndMin;
 
     /**
      * Page switch buttons.
@@ -168,6 +204,7 @@ public final class OvLView1 extends JFrame implements OvLView {
         //Declare the JPanels used in the tabbed pane
         this.userInfoPanels = new ArrayList<JPanel>();
         this.userEventPanels = new ArrayList<JPanel>();
+        this.eventPanels = new ArrayList<ArrayList<JPanel>>();
 
         //Declare the JTextAreas to be used in userInfoPanels
         this.names = new ArrayList<JTextField>();
