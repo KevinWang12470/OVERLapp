@@ -46,9 +46,16 @@ public final class OvLView1 extends JFrame implements OvLView {
 
     /**
      * JPanel Array list whose size is the same as the population. The panels,
-     * which contain inputed user info, go into each tabbed pane.
+     * which contain inputed user info, go into each tabbed pane. userPanels
+     * will contain the userInfoPanels and userEventPanels. UserPanels will be
+     * added to the tabbed pane.
      */
-    private ArrayList<JPanel> userInfoPanels, userEventPanels;
+    private ArrayList<JPanel> userPanels, userInfoPanels, userEventPanels;
+
+    /**
+     * JButtons that will be used to add event cards to the tabbed pane.
+     */
+    private ArrayList<JButton> bEventAdd;
 
     /**
      * Update buttons for each person involved.
@@ -202,6 +209,7 @@ public final class OvLView1 extends JFrame implements OvLView {
         this.userInfoPane = new JTabbedPane();
 
         //Declare the JPanels used in the tabbed pane
+        this.userPanels = new ArrayList<JPanel>();
         this.userInfoPanels = new ArrayList<JPanel>();
         this.userEventPanels = new ArrayList<JPanel>();
         this.eventPanels = new ArrayList<ArrayList<JPanel>>();
@@ -428,8 +436,8 @@ public final class OvLView1 extends JFrame implements OvLView {
 //        if(userInfoPanels)
 
         /*
-         * TODO: Add memory of already filled in tabs instead of clearing all
-         * panels
+         * Already did?: Add memory of already filled in tabs instead of
+         * clearing all panels
          */
         //Clear arrays if necessary
         this.userInfoPanels.clear();
@@ -447,6 +455,18 @@ public final class OvLView1 extends JFrame implements OvLView {
              */
             this.userInfoPanels.add(new JPanel());
             this.userEventPanels.add(new JPanel());
+            this.eventPanels.add(new ArrayList<JPanel>());
+
+            //TODO: Figure this out
+//            this.bEventAdd.add(new JButton("Add Event"));
+//            this.bEventAdd.get(i).addActionListener(this);
+
+            //Potential bug
+//            if (this.bEventAdd.size() < numOfP) {
+//                this.bEventAdd.add(new JButton("Add Event"));
+//                this.bEventAdd.get(this.bEventAdd.size() - 1)
+//                        .addActionListener(this);
+//            }
 
             /*
              * Create blank fields in JTextField arraylist that will be the name
@@ -463,10 +483,16 @@ public final class OvLView1 extends JFrame implements OvLView {
             this.userInfoPanels.get(i).add(this.eventNum.get(i));
             //this.userInfoPanels.get(i).add(this.bUpdate.get(i));
 
+            this.userPanels.add(this.userInfoPanels.get(i));
+            this.userPanels.add(this.userEventPanels.get(i));
+
             //put JPanel into designated tabbed pane slot
             this.userInfoPane.addTab("Person " + (i + 1),
-                    this.userInfoPanels.get(i));
+                    this.userPanels.get(i));
         }
+
+        //Experimenting with working on the event panels that follow.
+        //this.userInfoPane.add(this.userEventPanels.get(0), 1);
 
     }
 
