@@ -7,6 +7,7 @@ import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.util.ArrayList;
 
+import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JFrame;
@@ -213,6 +214,8 @@ public final class OvLView1 extends JFrame implements OvLView {
         this.userInfoPanels = new ArrayList<JPanel>();
         this.userEventPanels = new ArrayList<JPanel>();
         this.eventPanels = new ArrayList<ArrayList<JPanel>>();
+
+        this.bEventAdd = new ArrayList<JButton>();
 
         //Declare the JTextAreas to be used in userInfoPanels
         this.names = new ArrayList<JTextField>();
@@ -444,6 +447,7 @@ public final class OvLView1 extends JFrame implements OvLView {
         this.userEventPanels.clear();
         this.names.clear();
         this.eventNum.clear();
+        this.userPanels.clear();
 
         this.userInfoPane.removeAll();
 
@@ -457,9 +461,14 @@ public final class OvLView1 extends JFrame implements OvLView {
             this.userEventPanels.add(new JPanel());
             this.eventPanels.add(new ArrayList<JPanel>());
 
-            //TODO: Figure this out
-//            this.bEventAdd.add(new JButton("Add Event"));
-//            this.bEventAdd.get(i).addActionListener(this);
+            //include add event button in userEventPanels
+            this.bEventAdd.add(new JButton("Add Event"));
+            this.bEventAdd.get(i).addActionListener(this);
+            this.userEventPanels.get(i).add(this.bEventAdd.get(i));
+            /*
+             * TODO: Determine whether it's worth to create a new JPanel
+             * arraylist to contain the list of event panels
+             */
 
             //Potential bug
 //            if (this.bEventAdd.size() < numOfP) {
@@ -483,8 +492,11 @@ public final class OvLView1 extends JFrame implements OvLView {
             this.userInfoPanels.get(i).add(this.eventNum.get(i));
             //this.userInfoPanels.get(i).add(this.bUpdate.get(i));
 
-            this.userPanels.add(this.userInfoPanels.get(i));
-            this.userPanels.add(this.userEventPanels.get(i));
+            this.userPanels.add(new JPanel());
+            this.userPanels.get(i).setLayout(
+                    new BoxLayout(this.userPanels.get(i), BoxLayout.PAGE_AXIS));
+            this.userPanels.get(i).add(this.userInfoPanels.get(i));
+            this.userPanels.get(i).add(this.userEventPanels.get(i));
 
             //put JPanel into designated tabbed pane slot
             this.userInfoPane.addTab("Person " + (i + 1),
@@ -535,6 +547,11 @@ public final class OvLView1 extends JFrame implements OvLView {
         }
 
         return eventNumList;
+    }
+
+    @Override
+    public void createEventInputPanel(int userIndex) {
+        //TODO:uh start and finish plz
     }
 
     @Override

@@ -117,4 +117,13 @@ public interface OvLView extends ActionListener {
      * @return an int array of the number of events being participated in.
      */
     String[] recordUserEventNum();
+
+    /**
+     * Create a new Event Input Panel that users can use to input information
+     * for a single event.
+     *
+     * @param userIndex
+     *            What user the event panel is being added to.
+     */
+    void createEventInputPanel(int userIndex);
 }
