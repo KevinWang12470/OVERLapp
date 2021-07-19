@@ -459,16 +459,37 @@ public final class OvLView1 extends JFrame implements OvLView {
              */
             this.userInfoPanels.add(new JPanel());
             this.userEventPanels.add(new JPanel());
+
+            //set layout of userEventPanel
+            this.userEventPanels.get(i).setLayout(new BoxLayout(
+                    this.userEventPanels.get(i), BoxLayout.PAGE_AXIS));
+
+            //Create panel arraylist for each person
             this.eventPanels.add(new ArrayList<JPanel>());
+            //add a first panel to the arraylist
+            this.eventPanels.get(i).add(new JPanel());
+
+            //add some component to that first panel TEST TEST TEST
+            this.eventPanels.get(this.eventPanels.size() - 1).get(0)
+                    .add(new JButton("This is an event"));
 
             //include add event button in userEventPanels
             this.bEventAdd.add(new JButton("Add Event"));
             this.bEventAdd.get(i).addActionListener(this);
             this.userEventPanels.get(i).add(this.bEventAdd.get(i));
+
             /*
-             * TODO: Determine whether it's worth to create a new JPanel
-             * arraylist to contain the list of event panels
+             * add the test event to the user event panel. ensure it is located
+             * right above the event add button
              */
+            this.userEventPanels.get(i).add(this.eventPanels.get(i).get(0),
+                    this.eventPanels.get(i).size() - 1);
+
+            //test add a second event panel to the user events list
+            this.eventPanels.get(i).add(new JPanel());
+            this.eventPanels.get(i).get(1).add(new JComboBox());
+            this.userEventPanels.get(i).add(this.eventPanels.get(i).get(1),
+                    this.eventPanels.get(i).size() - 1);
 
             //Potential bug
 //            if (this.bEventAdd.size() < numOfP) {
