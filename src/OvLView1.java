@@ -13,6 +13,7 @@ import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JSpinner;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
@@ -83,7 +84,7 @@ public final class OvLView1 extends JFrame implements OvLView {
     /**
      * Name JTextFields for each event.
      */
-    private ArrayList<ArrayList<JTextField>> eventNames;
+    private ArrayList<ArrayList<JTextField>> eventNames, eventLocations;
 
     /**
      * Event Type ComboBoxes for each event.
@@ -93,22 +94,22 @@ public final class OvLView1 extends JFrame implements OvLView {
     /**
      * Event Start Hour comboBoxes for each event.
      */
-    private ArrayList<ArrayList<JComboBox>> eventStartHr;
+    private ArrayList<ArrayList<JSpinner>> eventStartHr;
 
     /**
      * Event Start Minute comboBoxes for each event.
      */
-    private ArrayList<ArrayList<JComboBox>> eventStartMin;
+    private ArrayList<ArrayList<JSpinner>> eventStartMin;
 
     /**
      * Event End Hour comboBoxes for each event.
      */
-    private ArrayList<ArrayList<JComboBox>> eventEndHr;
+    private ArrayList<ArrayList<JSpinner>> eventEndHr;
 
     /**
      * Event End Minute comboBoxes for each event.
      */
-    private ArrayList<ArrayList<JComboBox>> eventEndMin;
+    private ArrayList<ArrayList<JSpinner>> eventEndMin;
 
     /**
      * Page switch buttons.
@@ -573,6 +574,18 @@ public final class OvLView1 extends JFrame implements OvLView {
     @Override
     public void createEventInputPanel(int userIndex) {
         //TODO:uh start and finish plz
+        int size = this.eventPanels.get(userIndex).size();
+
+        //add a new panel
+        this.eventPanels.get(userIndex).add(new JPanel());
+
+        //tentative layout. Consider Group Layout
+        this.eventPanels.get(userIndex).get(size).setLayout(
+                new BoxLayout(this.eventPanels.get(userIndex).get(size),
+                        BoxLayout.PAGE_AXIS));
+
+        //decorate the panel
+
     }
 
     @Override
