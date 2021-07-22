@@ -8,6 +8,7 @@ import java.awt.event.ActionEvent;
 import java.util.ArrayList;
 
 import javax.swing.BoxLayout;
+import javax.swing.GroupLayout;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JFrame;
@@ -35,6 +36,11 @@ public final class OvLView1 extends JFrame implements OvLView {
      * The number of Panels that make up the GUI.
      */
     private static final int NUMOFPAGES = 3;
+
+    /**
+     * The types of events possible.
+     */
+    private static final String[] TYPESOFEVENTS = { "Class", "Other" };
 
     /**
      * The Panels that make up the GUI.
@@ -215,6 +221,10 @@ public final class OvLView1 extends JFrame implements OvLView {
         this.userInfoPanels = new ArrayList<JPanel>();
         this.userEventPanels = new ArrayList<JPanel>();
         this.eventPanels = new ArrayList<ArrayList<JPanel>>();
+
+        this.eventNames = new ArrayList<ArrayList<JTextField>>();
+        this.eventType = new ArrayList<ArrayList<JComboBox>>();
+        this.eventLocations = new ArrayList<ArrayList<JTextField>>();
 
         this.bEventAdd = new ArrayList<JButton>();
 
@@ -449,6 +459,10 @@ public final class OvLView1 extends JFrame implements OvLView {
         this.names.clear();
         this.eventNum.clear();
         this.userPanels.clear();
+        this.eventPanels.clear();
+        this.eventNames.clear();
+        this.eventLocations.clear();
+        this.eventType.clear();
 
         this.userInfoPane.removeAll();
 
@@ -467,30 +481,36 @@ public final class OvLView1 extends JFrame implements OvLView {
 
             //Create panel arraylist for each person
             this.eventPanels.add(new ArrayList<JPanel>());
-            //add a first panel to the arraylist
-            this.eventPanels.get(i).add(new JPanel());
+            this.eventNames.add(new ArrayList<JTextField>());
+            this.eventLocations.add(new ArrayList<JTextField>());
+            this.eventType.add(new ArrayList<JComboBox>());
 
-            //add some component to that first panel TEST TEST TEST
-            this.eventPanels.get(this.eventPanels.size() - 1).get(0)
-                    .add(new JButton("This is an event"));
+            //add a first panel to the arraylist
+            //this.eventPanels.get(i).add(new JPanel());
 
             //include add event button in userEventPanels
             this.bEventAdd.add(new JButton("Add Event"));
             this.bEventAdd.get(i).addActionListener(this);
             this.userEventPanels.get(i).add(this.bEventAdd.get(i));
 
+            //add some component to that first panel TEST TEST TEST
+            this.createEventInputPanel(i);
+//            this.eventPanels.get(this.eventPanels.size() - 1).get(0)
+//                    .add(new JButton("This is an event"));
+//
+
             /*
              * add the test event to the user event panel. ensure it is located
              * right above the event add button
              */
-            this.userEventPanels.get(i).add(this.eventPanels.get(i).get(0),
-                    this.eventPanels.get(i).size() - 1);
-
-            //test add a second event panel to the user events list
-            this.eventPanels.get(i).add(new JPanel());
-            this.eventPanels.get(i).get(1).add(new JComboBox());
-            this.userEventPanels.get(i).add(this.eventPanels.get(i).get(1),
-                    this.eventPanels.get(i).size() - 1);
+//            this.userEventPanels.get(i).add(this.eventPanels.get(i).get(0),
+//                    this.eventPanels.get(i).size() - 1);
+//
+//            //test add a second event panel to the user events list
+//            this.eventPanels.get(i).add(new JPanel());
+//            this.eventPanels.get(i).get(1).add(new JComboBox());
+//            this.userEventPanels.get(i).add(this.eventPanels.get(i).get(1),
+//                    this.eventPanels.get(i).size() - 1);
 
             //Potential bug
 //            if (this.bEventAdd.size() < numOfP) {
@@ -574,18 +594,51 @@ public final class OvLView1 extends JFrame implements OvLView {
     @Override
     public void createEventInputPanel(int userIndex) {
         //TODO:uh start and finish plz
-        int size = this.eventPanels.get(userIndex).size();
 
         //add a new panel
         this.eventPanels.get(userIndex).add(new JPanel());
+        int size = this.eventPanels.get(userIndex).size();
+
+//        System.out.println();
+//        System.out.println("Size: " + size);
+//        System.out.println();
 
         //tentative layout. Consider Group Layout
-        this.eventPanels.get(userIndex).get(size).setLayout(
-                new BoxLayout(this.eventPanels.get(userIndex).get(size),
-                        BoxLayout.PAGE_AXIS));
+        GroupLayout eventLayout = new GroupLayout(
+                this.eventPanels.get(userIndex).get(size - 1));
+        this.eventPanels.get(userIndex).get(size - 1).setLayout(eventLayout);
 
         //decorate the panel
+        JLabel eventLabel = new JLabel("Event " + size);
+        JLabel eventName = new JLabel("Name: ");
+        JLabel eventType = new JLabel("Event Type: ");
 
+        this.eventNames.get(userIndex).add(new JTextField());
+        //questionable
+        this.eventType.get(userIndex).add(new JComboBox<String>(TYPESOFEVENTS));
+        this.eventLocations.get(userIndex).add(new JTextField());
+
+        eventLayout.setHorizontalGroup(eventLayout.createSequentialGroup()
+                .addComponent(eventLabel)
+                .addGroup(eventLayout
+                        .createParallelGroup(GroupLayout.Alignment.LEADING)
+                        .addComponent(eventName))
+                .addComponent(eventName)
+                .addComponent(this.eventNames.get(userIndex).get(size - 1))
+                .addComponent(eventType)
+                .addComponent(this.eventType.get(userIndex).get(size - 1)));
+        eventLayout.setVerticalGroup(eventLayout.createSequentialGroup()
+                .addComponent(eventLabel)
+                .addGroup(eventLayout
+                        .createParallelGroup(GroupLayout.Alignment.LEADING)
+                        .addComponent(eventName)
+                        .addComponent(
+                                this.eventNames.get(userIndex).get(size - 1))
+                        .addComponent(eventType).addComponent(
+                                this.eventType.get(userIndex).get(size - 1))));
+
+        this.userEventPanels.get(userIndex)
+                .add(this.eventPanels.get(userIndex).get(size - 1), size - 1);
     }
 
     @Override
